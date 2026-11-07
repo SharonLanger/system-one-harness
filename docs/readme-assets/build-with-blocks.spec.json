@@ -1,0 +1,133 @@
+{
+  "loop": 8,
+  "events": [
+    {
+      "id": "pick",
+      "kind": "show",
+      "at": 0.2,
+      "until": 2.4
+    },
+    {
+      "id": "flowhold",
+      "kind": "show",
+      "at": 2.0,
+      "until": 4.6
+    },
+    {
+      "id": "pluginhold",
+      "kind": "show",
+      "at": 4.3,
+      "until": 6.4
+    },
+    {
+      "id": "question",
+      "kind": "packet",
+      "at": 1,
+      "travel": 1,
+      "from": [
+        168,
+        188
+      ],
+      "via": [
+        [
+          168,
+          224
+        ],
+        [
+          280,
+          224
+        ]
+      ],
+      "to": [
+        280,
+        260
+      ],
+      "glow": {
+        "x": 200,
+        "y": 260,
+        "w": 260,
+        "h": 72
+      },
+      "note": "Compose the question block into a flow"
+    },
+    {
+      "id": "tool",
+      "kind": "packet",
+      "travel": 1,
+      "from": [
+        492,
+        188
+      ],
+      "via": [
+        [
+          492,
+          224
+        ],
+        [
+          380,
+          224
+        ]
+      ],
+      "to": [
+        380,
+        260
+      ],
+      "note": "Compose the deterministic tool into the same flow",
+      "with": "question"
+    },
+    {
+      "id": "connect",
+      "kind": "packet",
+      "at": 3.5,
+      "travel": 0.8,
+      "from": [
+        328,
+        332
+      ],
+      "to": [
+        328,
+        388
+      ],
+      "glow": {
+        "x": 200,
+        "y": 388,
+        "w": 260,
+        "h": 64
+      },
+      "note": "Connect the flow through plugin hook wiring"
+    },
+    {
+      "id": "caption0",
+      "kind": "phase",
+      "at": 0.1,
+      "until": 2.4,
+      "text": "Choose reusable pieces",
+      "x": 328,
+      "y": 92,
+      "anchor": "middle",
+      "class": "act"
+    },
+    {
+      "id": "caption1",
+      "kind": "phase",
+      "at": 2.5,
+      "until": 4.5,
+      "text": "Compose your flow",
+      "x": 328,
+      "y": 92,
+      "anchor": "middle",
+      "class": "act"
+    },
+    {
+      "id": "caption2",
+      "kind": "phase",
+      "at": 4.6,
+      "until": 6.5,
+      "text": "Connect it to Claude Code",
+      "x": 328,
+      "y": 92,
+      "anchor": "middle",
+      "class": "act"
+    }
+  ]
+}

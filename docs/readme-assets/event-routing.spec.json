@@ -1,0 +1,243 @@
+{
+  "loop": 12,
+  "events": [
+    {
+      "id": "in1",
+      "kind": "packet",
+      "at": 0.3,
+      "travel": 0.6,
+      "from": [
+        328,
+        180
+      ],
+      "to": [
+        328,
+        224
+      ],
+      "glow": {
+        "x": 236,
+        "y": 224,
+        "w": 184,
+        "h": 56
+      },
+      "note": "Event 1 reaches the dispatcher"
+    },
+    {
+      "id": "out1A",
+      "kind": "packet",
+      "at": 1.2,
+      "travel": 0.6,
+      "from": [
+        292,
+        280
+      ],
+      "via": [
+        [
+          292,
+          304
+        ],
+        [
+          160,
+          304
+        ]
+      ],
+      "to": [
+        160,
+        336
+      ],
+      "glow": {
+        "x": 76,
+        "y": 336,
+        "w": 168,
+        "h": 56
+      },
+      "note": "Event 1 activates flow A"
+    },
+    {
+      "id": "phase1",
+      "kind": "phase",
+      "at": 0.09999999999999998,
+      "until": 2.9,
+      "text": "EVENT 1 → FLOW A ONLY",
+      "x": 328,
+      "y": 432,
+      "anchor": "middle",
+      "class": "t-tag"
+    },
+    {
+      "id": "route1",
+      "kind": "show",
+      "at": 1.15,
+      "until": 2.4
+    },
+    {
+      "id": "in2",
+      "kind": "packet",
+      "at": 3.8,
+      "travel": 0.6,
+      "from": [
+        328,
+        180
+      ],
+      "to": [
+        328,
+        224
+      ],
+      "glow": {
+        "x": 236,
+        "y": 224,
+        "w": 184,
+        "h": 56
+      },
+      "note": "Event 2 reaches the dispatcher"
+    },
+    {
+      "id": "out2B",
+      "kind": "packet",
+      "at": 4.7,
+      "travel": 0.6,
+      "from": [
+        364,
+        280
+      ],
+      "via": [
+        [
+          364,
+          304
+        ],
+        [
+          500,
+          304
+        ]
+      ],
+      "to": [
+        500,
+        336
+      ],
+      "glow": {
+        "x": 416,
+        "y": 336,
+        "w": 168,
+        "h": 56
+      },
+      "note": "Event 2 activates flow B"
+    },
+    {
+      "id": "phase2",
+      "kind": "phase",
+      "at": 3.5999999999999996,
+      "until": 6.4,
+      "text": "EVENT 2 → FLOW B ONLY",
+      "x": 328,
+      "y": 432,
+      "anchor": "middle",
+      "class": "t-tag"
+    },
+    {
+      "id": "route2",
+      "kind": "show",
+      "at": 4.6499999999999995,
+      "until": 5.9
+    },
+    {
+      "id": "in3",
+      "kind": "packet",
+      "at": 7.3,
+      "travel": 0.6,
+      "from": [
+        328,
+        180
+      ],
+      "to": [
+        328,
+        224
+      ],
+      "glow": {
+        "x": 236,
+        "y": 224,
+        "w": 184,
+        "h": 56
+      },
+      "note": "Event 3 reaches the dispatcher"
+    },
+    {
+      "id": "out3A",
+      "kind": "packet",
+      "at": 8.2,
+      "travel": 0.6,
+      "from": [
+        292,
+        280
+      ],
+      "via": [
+        [
+          292,
+          304
+        ],
+        [
+          160,
+          304
+        ]
+      ],
+      "to": [
+        160,
+        336
+      ],
+      "glow": {
+        "x": 76,
+        "y": 336,
+        "w": 168,
+        "h": 56
+      },
+      "note": "Event 3 activates flow A concurrently"
+    },
+    {
+      "id": "out3B",
+      "kind": "packet",
+      "at": 8.2,
+      "travel": 0.6,
+      "from": [
+        364,
+        280
+      ],
+      "via": [
+        [
+          364,
+          304
+        ],
+        [
+          500,
+          304
+        ]
+      ],
+      "to": [
+        500,
+        336
+      ],
+      "glow": {
+        "x": 416,
+        "y": 336,
+        "w": 168,
+        "h": 56
+      },
+      "note": "Event 3 activates flow B concurrently"
+    },
+    {
+      "id": "phase3",
+      "kind": "phase",
+      "at": 7.1,
+      "until": 9.9,
+      "text": "EVENT 3 → A + B CONCURRENTLY",
+      "x": 328,
+      "y": 432,
+      "anchor": "middle",
+      "class": "t-tag"
+    },
+    {
+      "id": "route3",
+      "kind": "show",
+      "at": 8.15,
+      "until": 9.4
+    }
+  ]
+}

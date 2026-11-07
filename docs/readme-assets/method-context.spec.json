@@ -1,0 +1,809 @@
+{
+  "loop": 32.92,
+  "events": [
+    {
+      "id": "node0_entry",
+      "kind": "show",
+      "at": 0.2,
+      "until": 0.48
+    },
+    {
+      "id": "p0_0",
+      "kind": "packet",
+      "at": 0.58,
+      "travel": 0.42,
+      "from": [
+        300,
+        180
+      ],
+      "via": [],
+      "to": [
+        300,
+        252
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Explain calculate: entry to file"
+    },
+    {
+      "id": "n0_0",
+      "kind": "show",
+      "at": 1.0,
+      "until": 1.28
+    },
+    {
+      "id": "p0_1",
+      "kind": "packet",
+      "at": 1.38,
+      "travel": 0.42,
+      "from": [
+        300,
+        316
+      ],
+      "via": [],
+      "to": [
+        300,
+        364
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Explain calculate: file to action"
+    },
+    {
+      "id": "n0_1",
+      "kind": "show",
+      "at": 1.8,
+      "until": 2.08
+    },
+    {
+      "id": "p0_2",
+      "kind": "packet",
+      "at": 2.18,
+      "travel": 0.6,
+      "from": [
+        180,
+        428
+      ],
+      "via": [
+        [
+          180,
+          452
+        ],
+        [
+          138,
+          452
+        ]
+      ],
+      "to": [
+        138,
+        476
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Explain calculate: action to explain"
+    },
+    {
+      "id": "n0_2",
+      "kind": "show",
+      "at": 2.78,
+      "until": 3.06
+    },
+    {
+      "id": "p0_3",
+      "kind": "packet",
+      "at": 3.16,
+      "travel": 0.6,
+      "from": [
+        138,
+        524
+      ],
+      "via": [
+        [
+          138,
+          548
+        ],
+        [
+          264,
+          548
+        ]
+      ],
+      "to": [
+        264,
+        572
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Explain calculate: explain to outline"
+    },
+    {
+      "id": "n0_3",
+      "kind": "show",
+      "at": 3.76,
+      "until": 4.04
+    },
+    {
+      "id": "p0_4",
+      "kind": "packet",
+      "at": 4.14,
+      "travel": 0.42,
+      "from": [
+        300,
+        636
+      ],
+      "via": [],
+      "to": [
+        300,
+        684
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Explain calculate: outline to method"
+    },
+    {
+      "id": "n0_4",
+      "kind": "show",
+      "at": 4.56,
+      "until": 4.84
+    },
+    {
+      "id": "p0_5",
+      "kind": "packet",
+      "at": 4.94,
+      "travel": 0.42,
+      "from": [
+        300,
+        748
+      ],
+      "via": [],
+      "to": [
+        300,
+        796
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Explain calculate: method to checks"
+    },
+    {
+      "id": "n0_5",
+      "kind": "show",
+      "at": 5.36,
+      "until": 5.64
+    },
+    {
+      "id": "p0_6",
+      "kind": "packet",
+      "at": 5.74,
+      "travel": 0.42,
+      "from": [
+        300,
+        860
+      ],
+      "via": [],
+      "to": [
+        300,
+        940
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Explain calculate: checks to result"
+    },
+    {
+      "id": "n0_6",
+      "kind": "show",
+      "at": 6.16,
+      "until": 6.86
+    },
+    {
+      "id": "caption0",
+      "kind": "phase",
+      "at": 0.2,
+      "until": 6.96,
+      "text": "Explain calculate",
+      "x": 400,
+      "y": 104,
+      "anchor": "middle",
+      "color": "#4CF490",
+      "class": "phase"
+    },
+    {
+      "id": "node1_entry",
+      "kind": "show",
+      "at": 7.46,
+      "until": 7.74
+    },
+    {
+      "id": "p1_0",
+      "kind": "packet",
+      "at": 7.84,
+      "travel": 0.42,
+      "from": [
+        300,
+        180
+      ],
+      "via": [],
+      "to": [
+        300,
+        252
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Generate tests for calculate: entry to file"
+    },
+    {
+      "id": "n1_0",
+      "kind": "show",
+      "at": 8.26,
+      "until": 8.54
+    },
+    {
+      "id": "p1_1",
+      "kind": "packet",
+      "at": 8.64,
+      "travel": 0.42,
+      "from": [
+        300,
+        316
+      ],
+      "via": [],
+      "to": [
+        300,
+        364
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Generate tests for calculate: file to action"
+    },
+    {
+      "id": "n1_1",
+      "kind": "show",
+      "at": 9.06,
+      "until": 9.34
+    },
+    {
+      "id": "p1_2",
+      "kind": "packet",
+      "at": 9.44,
+      "travel": 0.6,
+      "from": [
+        300,
+        428
+      ],
+      "via": [
+        [
+          300,
+          452
+        ],
+        [
+          318,
+          452
+        ]
+      ],
+      "to": [
+        318,
+        476
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Generate tests for calculate: action to tests"
+    },
+    {
+      "id": "n1_2",
+      "kind": "show",
+      "at": 10.04,
+      "until": 10.32
+    },
+    {
+      "id": "p1_3",
+      "kind": "packet",
+      "at": 10.42,
+      "travel": 0.6,
+      "from": [
+        318,
+        524
+      ],
+      "via": [
+        [
+          318,
+          548
+        ],
+        [
+          336,
+          548
+        ]
+      ],
+      "to": [
+        336,
+        572
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Generate tests for calculate: tests to outline"
+    },
+    {
+      "id": "n1_3",
+      "kind": "show",
+      "at": 11.02,
+      "until": 11.3
+    },
+    {
+      "id": "p1_4",
+      "kind": "packet",
+      "at": 11.4,
+      "travel": 0.42,
+      "from": [
+        300,
+        636
+      ],
+      "via": [],
+      "to": [
+        300,
+        684
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Generate tests for calculate: outline to method"
+    },
+    {
+      "id": "n1_4",
+      "kind": "show",
+      "at": 11.82,
+      "until": 12.1
+    },
+    {
+      "id": "p1_5",
+      "kind": "packet",
+      "at": 12.2,
+      "travel": 0.42,
+      "from": [
+        300,
+        748
+      ],
+      "via": [],
+      "to": [
+        300,
+        796
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Generate tests for calculate: method to checks"
+    },
+    {
+      "id": "n1_5",
+      "kind": "show",
+      "at": 12.62,
+      "until": 12.9
+    },
+    {
+      "id": "p1_6",
+      "kind": "packet",
+      "at": 13.0,
+      "travel": 0.42,
+      "from": [
+        300,
+        860
+      ],
+      "via": [],
+      "to": [
+        300,
+        940
+      ],
+      "ring": true,
+      "color": "#4CF490",
+      "note": "Generate tests for calculate: checks to result"
+    },
+    {
+      "id": "n1_6",
+      "kind": "show",
+      "at": 13.42,
+      "until": 14.12
+    },
+    {
+      "id": "caption1",
+      "kind": "phase",
+      "at": 7.46,
+      "until": 14.22,
+      "text": "Generate tests for calculate",
+      "x": 400,
+      "y": 104,
+      "anchor": "middle",
+      "color": "#4CF490",
+      "class": "phase"
+    },
+    {
+      "id": "node2_entry",
+      "kind": "show",
+      "at": 14.72,
+      "until": 15.0
+    },
+    {
+      "id": "p2_0",
+      "kind": "packet",
+      "at": 15.1,
+      "travel": 0.42,
+      "from": [
+        300,
+        180
+      ],
+      "via": [],
+      "to": [
+        300,
+        252
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Modify calculate: entry to file"
+    },
+    {
+      "id": "n2_0",
+      "kind": "show",
+      "at": 15.52,
+      "until": 15.8
+    },
+    {
+      "id": "p2_1",
+      "kind": "packet",
+      "at": 15.9,
+      "travel": 0.42,
+      "from": [
+        300,
+        316
+      ],
+      "via": [],
+      "to": [
+        300,
+        364
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Modify calculate: file to action"
+    },
+    {
+      "id": "n2_1",
+      "kind": "show",
+      "at": 16.32,
+      "until": 16.6
+    },
+    {
+      "id": "p2_2",
+      "kind": "packet",
+      "at": 16.7,
+      "travel": 0.6,
+      "from": [
+        420,
+        428
+      ],
+      "via": [
+        [
+          420,
+          452
+        ],
+        [
+          498,
+          452
+        ]
+      ],
+      "to": [
+        498,
+        476
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Modify calculate: action to modify"
+    },
+    {
+      "id": "n2_2",
+      "kind": "show",
+      "at": 17.3,
+      "until": 17.58
+    },
+    {
+      "id": "p2_3",
+      "kind": "packet",
+      "at": 17.68,
+      "travel": 0.6,
+      "from": [
+        572,
+        500
+      ],
+      "via": [
+        [
+          588,
+          500
+        ],
+        [
+          588,
+          844
+        ]
+      ],
+      "to": [
+        600,
+        844
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Modify calculate: modify to none"
+    },
+    {
+      "id": "n2_3",
+      "kind": "show",
+      "at": 18.28,
+      "until": 18.98
+    },
+    {
+      "id": "caption2",
+      "kind": "phase",
+      "at": 14.72,
+      "until": 19.08,
+      "text": "Modify calculate",
+      "x": 400,
+      "y": 104,
+      "anchor": "middle",
+      "color": "#FBDC8E",
+      "class": "phase"
+    },
+    {
+      "id": "node3_entry",
+      "kind": "show",
+      "at": 19.58,
+      "until": 19.86
+    },
+    {
+      "id": "p3_0",
+      "kind": "packet",
+      "at": 19.96,
+      "travel": 0.42,
+      "from": [
+        300,
+        180
+      ],
+      "via": [],
+      "to": [
+        300,
+        252
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Explain an unclear method: entry to file"
+    },
+    {
+      "id": "n3_0",
+      "kind": "show",
+      "at": 20.38,
+      "until": 20.66
+    },
+    {
+      "id": "p3_1",
+      "kind": "packet",
+      "at": 20.76,
+      "travel": 0.42,
+      "from": [
+        300,
+        316
+      ],
+      "via": [],
+      "to": [
+        300,
+        364
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Explain an unclear method: file to action"
+    },
+    {
+      "id": "n3_1",
+      "kind": "show",
+      "at": 21.18,
+      "until": 21.46
+    },
+    {
+      "id": "p3_2",
+      "kind": "packet",
+      "at": 21.56,
+      "travel": 0.6,
+      "from": [
+        180,
+        428
+      ],
+      "via": [
+        [
+          180,
+          452
+        ],
+        [
+          138,
+          452
+        ]
+      ],
+      "to": [
+        138,
+        476
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Explain an unclear method: action to explain"
+    },
+    {
+      "id": "n3_2",
+      "kind": "show",
+      "at": 22.16,
+      "until": 22.44
+    },
+    {
+      "id": "p3_3",
+      "kind": "packet",
+      "at": 22.54,
+      "travel": 0.6,
+      "from": [
+        138,
+        524
+      ],
+      "via": [
+        [
+          138,
+          548
+        ],
+        [
+          264,
+          548
+        ]
+      ],
+      "to": [
+        264,
+        572
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Explain an unclear method: explain to outline"
+    },
+    {
+      "id": "n3_3",
+      "kind": "show",
+      "at": 23.14,
+      "until": 23.42
+    },
+    {
+      "id": "p3_4",
+      "kind": "packet",
+      "at": 23.52,
+      "travel": 0.42,
+      "from": [
+        300,
+        636
+      ],
+      "via": [],
+      "to": [
+        300,
+        684
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Explain an unclear method: outline to method"
+    },
+    {
+      "id": "n3_4",
+      "kind": "show",
+      "at": 23.94,
+      "until": 24.22
+    },
+    {
+      "id": "p3_5",
+      "kind": "packet",
+      "at": 24.32,
+      "travel": 0.6,
+      "from": [
+        504,
+        716
+      ],
+      "via": [
+        [
+          588,
+          716
+        ],
+        [
+          588,
+          844
+        ]
+      ],
+      "to": [
+        600,
+        844
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Explain an unclear method: method to none"
+    },
+    {
+      "id": "n3_5",
+      "kind": "show",
+      "at": 24.92,
+      "until": 25.62
+    },
+    {
+      "id": "caption3",
+      "kind": "phase",
+      "at": 19.58,
+      "until": 25.72,
+      "text": "Explain an unclear method",
+      "x": 400,
+      "y": 104,
+      "anchor": "middle",
+      "color": "#FBDC8E",
+      "class": "phase"
+    },
+    {
+      "id": "node4_entry",
+      "kind": "show",
+      "at": 26.22,
+      "until": 26.5
+    },
+    {
+      "id": "p4_0",
+      "kind": "packet",
+      "at": 26.6,
+      "travel": 0.42,
+      "from": [
+        300,
+        180
+      ],
+      "via": [],
+      "to": [
+        300,
+        252
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Explain a missing file: entry to file"
+    },
+    {
+      "id": "n4_0",
+      "kind": "show",
+      "at": 27.02,
+      "until": 27.3
+    },
+    {
+      "id": "p4_1",
+      "kind": "packet",
+      "at": 27.4,
+      "travel": 0.6,
+      "from": [
+        504,
+        284
+      ],
+      "via": [
+        [
+          588,
+          284
+        ],
+        [
+          588,
+          844
+        ]
+      ],
+      "to": [
+        600,
+        844
+      ],
+      "ring": true,
+      "color": "#FBDC8E",
+      "note": "Explain a missing file: file to none"
+    },
+    {
+      "id": "n4_1",
+      "kind": "show",
+      "at": 28.0,
+      "until": 28.7
+    },
+    {
+      "id": "caption4",
+      "kind": "phase",
+      "at": 26.22,
+      "until": 28.8,
+      "text": "Explain a missing file",
+      "x": 400,
+      "y": 104,
+      "anchor": "middle",
+      "color": "#FBDC8E",
+      "class": "phase"
+    }
+  ]
+}

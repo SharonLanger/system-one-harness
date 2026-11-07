@@ -6,7 +6,7 @@ import sys
 def prohibited(path):
     p = PurePosixPath(path)
     parts = p.parts
-    if '.idea' in parts or p.suffix == '.iml' or p.name == '.DS_Store':
+    if '.idea' in parts or '.logs' in parts or p.suffix == '.iml' or p.name == '.DS_Store':
         return True
     if parts[0] in {'logs', 'results', 'backup', 'build', 'dist', 'coverage', 'htmlcov'}:
         return True

@@ -1,6 +1,7 @@
 """Per-invocation project metadata; never selects the feature's source root."""
 from dataclasses import replace
 from pathlib import Path
+from soh_logging import ComponentName, ComponentType, component_scope
 
 
 def resolve_project_directory(project_dir):
@@ -22,6 +23,7 @@ def resolve_project_directory(project_dir):
     return directory, status
 
 
+@component_scope(ComponentType.DISPATCHER, ComponentName.PROJECT_CONTEXT)
 def enrich_project_context(envelope, project_dir, logger):
     directory, status = resolve_project_directory(project_dir)
     enriched = replace(envelope, derived={**envelope.derived, 'project_dir': directory})

@@ -87,7 +87,7 @@ def test_full_input_and_metadata_without_dispatch_or_optional_prerequisites(tmp_
     assert observed['would_invoke_dispatcher'].endswith('.dispatch_hook')
     assert observed['event_dispatcher'].endswith('.dispatch_user_prompt_submit')
     final = records[-1]
-    assert final['session_id'] == 'unique'
+    assert final['session_id'] is None
     assert final['outcome'] == 'observed' and final['reason'] == 'observe_only'
     assert final['stdout_bytes_written'] == 0 and final['response_present'] is False
     assert not proc.stderr
@@ -203,7 +203,7 @@ raise SystemExit(main(['--hook','UserPromptSubmit','--observe-only']))
     assert proc.returncode == 0 and proc.stdout == '' and proc.stderr == ''
     records = [json.loads(line) for line in path.read_text().splitlines()]
     assert next(r for r in records if r['event'] == 'observation_input_received')['details']['raw_input'] == raw
-    assert all(r['pid'] and r['parent_pid'] for r in records)
+    assert all(r['pid'] and r['correlation_id'] for r in records)
     assert records[-1]['details']['outcome'] == 'observed'
 
 

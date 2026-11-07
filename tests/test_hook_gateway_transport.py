@@ -43,15 +43,18 @@ def test_process_noise_output_and_final_record(tmp_path,mode):
     script='''import json, os
 from hooks.gateway import main
 from hooks.contracts import Context, Noop, Failure
+from hooks.dispatcher import dispatch_hook
 records=[]
-def dispatch(*args):
-    args[-1]('INFO','common_input_validated',session_id='validated')
+def route(envelope,args,logger):
     print('python noise')
     os.write(1,b'native noise\\n')
     if MODE=='throw': raise ValueError('planned')
     if MODE=='timeout': raise TimeoutError('planned deadline')
     return {'context':Context('Known 😀'), 'noop':Noop('multiple_relevant'),
             'failure':Failure('planned','feature'), 'invalid':None}.get(MODE)
+def dispatch(payload,args,invocation_id,logger):
+    return dispatch_hook(payload,args,invocation_id,logger,
+                         dispatchers={'UserPromptSubmit':route})
 def logger(l,e,**d):
     print('logger noise')
     os.write(1,b'logger native noise\\n')
@@ -59,7 +62,9 @@ def logger(l,e,**d):
 main(['--hook','UserPromptSubmit'],dispatcher=dispatch,logger=logger)
 open(LOG,'w').write(json.dumps(records))
 '''.replace('MODE',repr(mode)).replace('LOG',repr(str(tmp_path/'log.json')))
-    r=subprocess.run([sys.executable,'-c',script],input='{"hook_event_name":"UserPromptSubmit"}',
+    payload={'hook_event_name':'UserPromptSubmit','session_id':'validated',
+             'cwd':str(tmp_path),'transcript_path':'unused.jsonl'}
+    r=subprocess.run([sys.executable,'-c',script],input=json.dumps(payload),
         text=True,capture_output=True,timeout=5,env={**os.environ,'PYTHONPATH':str(ROOT/'src')})
     assert r.returncode==0
     assert 'python noise' in r.stderr and 'native noise' in r.stderr

@@ -27,7 +27,7 @@ py-modules = ["blocks", "context_format", "json_utils", "live_check", "log_utils
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["answers*", "block_runtime*", "building_blocks*", "cli*", "defaults*", "flows*", "hooks*", "laya*", "questions*"]
+include = ["answers*", "block_runtime*", "building_blocks*", "cli*", "defaults*", "flows*", "hooks*", "laya*", "questions*", "soh_logging*"]
 namespaces = false
 
 [tool.setuptools.package-data]

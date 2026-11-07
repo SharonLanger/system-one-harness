@@ -2,6 +2,7 @@
 from pathlib import Path
 import re
 from log_utils import log
+from soh_logging import FlowName, flow_scope
 
 from building_blocks.file_reference_utils import detect_file_references, detect_configured_references
 from building_blocks.resolve_file import resolve_file
@@ -15,7 +16,7 @@ ELIGIBLE = re.compile(r'^\s*Explain\s+`(?P<target>[^`\r\n]+)`\s*:\s*(?P<question
 
 
 def _noop(reason):
-    log("INFO", "flow", "finished", flow="sandbox_file_method_context", status="noop", reason=reason)
+    log("INFO", "sandbox_file_method_context", "finished", status="noop", reason=reason)
     return {'status': 'noop', 'reason': reason, 'context': None}
 
 
@@ -24,6 +25,7 @@ def _confined(path, root):
     return canonical == path and canonical.is_relative_to(root)
 
 
+@flow_scope(FlowName.SANDBOX_FILE_METHOD_CONTEXT)
 def run(prompt, *, cwd, repository_root, config, registry,
         reference_pattern=_OMITTED_REFERENCE_PATTERN, node='node', helper=DEFAULT_HELPER,
         timeout=5.0, max_candidates=64, max_input_chars=16000,
@@ -35,7 +37,7 @@ def run(prompt, *, cwd, repository_root, config, registry,
     trigger, not a general intent classifier. All source work is read-only; only
     SDK load/predict is injected for offline use. Dependency context is partial.
     """
-    log("INFO", "flow", "started", flow="sandbox_file_method_context", prompt=prompt,
+    log("INFO", "sandbox_file_method_context", "started", prompt=prompt,
         cwd=cwd, repository_root=repository_root)
     if type(resolve_from_project_root) is not bool:
         return _noop('invalid_resolution_mode')
@@ -55,9 +57,9 @@ def run(prompt, *, cwd, repository_root, config, registry,
         log("ERROR", "extractor", "reference_transport_failed", error=exc)
         return _noop('extractor_error')
     except (ValueError, TypeError) as exc:
-        log("ERROR", "flow", "reference_failed", error=exc)
+        log("ERROR", "sandbox_file_method_context", "reference_failed", error=exc)
         return _noop('invalid_reference')
-    log("DEBUG", "flow", "references_detected", references=references)
+    log("DEBUG", "sandbox_file_method_context", "references_detected", references=references)
     if not references:
         return _noop('no_file')
     if len(references) != 1:
@@ -72,7 +74,7 @@ def run(prompt, *, cwd, repository_root, config, registry,
         resolution = resolve_file(reference, cwd=cwd, repository_root=repository_root,
                                   node=node, helper=helper, timeout=timeout,
             **({'resolve_from_project_root': True} if resolve_from_project_root else {}))
-        log("DEBUG", "flow", "file_resolved", resolution=resolution)
+        log("DEBUG", "sandbox_file_method_context", "file_resolved", resolution=resolution)
         if resolution.status != 'resolved':
             return _noop(resolution.status)
         path = resolution.selected_path
@@ -100,12 +102,12 @@ def run(prompt, *, cwd, repository_root, config, registry,
             selection = select_method(second_text, source_outline, config=fallback_config, registry=registry,
                                       max_candidates=max_candidates, max_input_chars=fallback_max_input_chars)
     except TimeoutError as exc:
-        log("ERROR", "flow", "selection_timeout", error=exc)
+        log("ERROR", "sandbox_file_method_context", "selection_timeout", error=exc)
         return _noop('deadline_exceeded')
     except Exception as exc:
-        log("ERROR", "flow", "selection_failed", error=exc)
+        log("ERROR", "sandbox_file_method_context", "selection_failed", error=exc)
         return _noop('model_error')
-    log("DEBUG", "flow", "method_selected", selection=selection)
+    log("DEBUG", "sandbox_file_method_context", "method_selected", selection=selection)
     if selection['selected_id'] is None:
         return _noop(selection['reason'])
     try:
@@ -120,7 +122,7 @@ def run(prompt, *, cwd, repository_root, config, registry,
             log("ERROR", "extractor", "context_snapshot_mismatch", expected=mapped, context=context)
             return _noop('extractor_error')
         context['coverage'] = 'partial'
-        log("INFO", "flow", "finished", flow="sandbox_file_method_context", status="context",
+        log("INFO", "sandbox_file_method_context", "finished", status="context",
             path=path, callable=context['callable'])
         return {'status': 'context', 'reason': None, 'context': context}
     except (OSError, ValueError, TypeError, KeyError, TypeScriptError) as exc:

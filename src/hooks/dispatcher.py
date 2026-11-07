@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from hooks.contracts import Noop, Failure, ValidationError, validate_result
+from soh_logging import ComponentName, ComponentType, component_scope, set_session
 
 @dataclass(frozen=True)
 class HookEnvelope:
@@ -39,6 +40,7 @@ def _post_compact_dispatch(envelope,args,logger):
     from hooks.post_compact.dispatcher import dispatch_post_compact
     return dispatch_post_compact(envelope,args,logger)
 
+@component_scope(ComponentType.DISPATCHER, ComponentName.HOOK_DISPATCHER)
 def dispatch_hook(payload,args,invocation_id,logger,*,dispatchers=None,enricher=enrich_envelope):
     result=None
     logger('INFO','hook_dispatcher_started',invocation_id=invocation_id,
@@ -65,6 +67,7 @@ def _dispatch_hook(payload,args,invocation_id,logger,*,dispatchers=None,enricher
             logger('INFO','hook_dispatcher_route_skipped',hook_event_name=name,reason='unsupported_event')
             return Noop('unsupported_event')
         envelope=ingest_common(payload,invocation_id)
+        set_session(envelope.common['session_id'], correlation_id=invocation_id)
         baseline=deepcopy(envelope)
         envelope=enricher(envelope)
         if (not isinstance(envelope,HookEnvelope) or envelope.common!=baseline.common

@@ -149,7 +149,7 @@ def test_post_compact_session_has_no_flow(tmp_path, run_gateway, monkeypatch):
     assert output.out == ''
     assert output.err == 'laya hook noop: session_state_logged\n'
     assert saved == [('validated', {'source': {'kind': 'hook', 'name': 'PostCompact'},
-                                    'type': 'PostCompact', 'payload': {}})]
+                                    'hook_name': 'PostCompact', 'type': 'PostCompact', 'payload': {}})]
     boundary = next(index for index, record in enumerate(records)
                     if record['event'] == 'common_input_validated')
     assert all(record['session_id'] is None for record in records[:boundary])

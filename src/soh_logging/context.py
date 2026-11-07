@@ -53,11 +53,19 @@ def bind(**fields):
         _current.reset(token)
 
 
-def set_session(session_id):
-    """Promote a validated session for the remainder of the invocation scope."""
+def set_session(session_id, *, correlation_id):
+    """Promote a validated session only into the matching invocation scope.
+
+    Standalone dispatchers must not mutate the default context or an unrelated
+    invocation. The enclosing invocation restores this update on every exit.
+    """
     if not isinstance(session_id, str) or not session_id.strip():
         raise ValueError('validated session_id required')
-    _current.set(replace(_current.get(), session_id=session_id))
+    context = _current.get()
+    if not correlation_id or context.correlation_id != correlation_id:
+        return False
+    _current.set(replace(context, session_id=session_id))
+    return True
 
 
 def flow_scope(flow_name):

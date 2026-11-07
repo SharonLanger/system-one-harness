@@ -7,6 +7,9 @@ using UTC dates and full zero-padded hours. Installed copies use
 local path to override that location. `system-one-harness logs --last 20` reads
 recent records in file and append order. It does not create files.
 
+Existing `logs/debug.jsonl` files are left untouched; logging does not copy,
+rewrite, or delete old output when it starts writing to the new location.
+
 Every line is a version-1 JSON object with `schema_version`, `timestamp`,
 `level`, `message`, `event`, `component_type`, `component`, `hook_event`,
 `session_id`, `correlation_id`, `flow_name`, `pid`, and `details`. Contextual
@@ -17,6 +20,14 @@ fields where existing events include them. The log writer uses a process lock
 and owner-only permissions on new Unix files and directories. Power loss or
 process termination during a write can leave a partial final line; there is no
 retention or automatic cleanup in this version.
+
+The common dispatcher promotes the validated session before project-context
+enrichment, so `project_context_ingested` and later records share the same
+top-level session. Startup, raw input, and rejected common input retain a null
+session. Observe-only mode does not validate common input, so its top-level
+session remains null; supplied session values may still appear in details.
+Promotion requires the dispatcher's invocation ID to match the active logging
+context, and gateway exit restores the previous context on every path.
 
 ## Gateway
 

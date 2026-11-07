@@ -96,7 +96,7 @@ def test_context_propagates_and_resets_across_component_scopes(tmp_path, monkeyp
 
     with invocation('inv-1', HookEvent.USERPROMPTSUBMIT):
         log_utils.log('INFO', 'hook_gateway', 'gateway_started')
-        set_session('session-1')
+        set_session('session-1', correlation_id='inv-1')
         dispatched()
         flowing()
         assert current_component() is None
@@ -172,7 +172,7 @@ raise SystemExit(main(['--hook', 'UserPromptSubmit'], dispatcher=dispatch))
 
 def test_context_resets_after_exception_and_nested_invocation():
     with invocation('outer', HookEvent.POSTCOMPACT):
-        set_session('old')
+        set_session('old', correlation_id='outer')
         with pytest.raises(RuntimeError):
             with invocation('inner', HookEvent.USERPROMPTSUBMIT):
                 assert current_context().session_id is None

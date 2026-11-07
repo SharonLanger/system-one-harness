@@ -8,6 +8,8 @@ from pathlib import Path
 def _safe_repr(value):
     try:
         return repr(value)
+    except TimeoutError:
+        raise
     except Exception:
         return f'<unrepresentable {type(value).__name__}>'
 

@@ -116,7 +116,6 @@ def _main(argv=None, *, dispatcher=None, logger=None, invocation_id):
     previous_handler=None
     expired=False
     logging_disabled=False
-    validated_session=None
 
     def expire(signum,frame):
         nonlocal expired
@@ -124,16 +123,11 @@ def _main(argv=None, *, dispatcher=None, logger=None, invocation_id):
         raise TimeoutError('hook deadline exceeded')
 
     def log(level,event,**details):
-        nonlocal validated_session
         if not timer_started or expired or logging_disabled:
             return False
-        if event=='common_input_validated':
-            validated_session=details.get('session_id')
-            if isinstance(validated_session, str) and validated_session.strip():
-                from soh_logging import set_session
-                set_session(validated_session)
+        from soh_logging import current_context
         metadata={'invocation_id':invocation_id,'hook_event_name':args.hook,
-                  'session_id':validated_session,**details}
+                  'session_id':current_context().session_id,**details}
         try:
             with isolate_stdout():
                 log_impl(level,event,**metadata)
@@ -196,7 +190,6 @@ def _main(argv=None, *, dispatcher=None, logger=None, invocation_id):
                     project_value=os.environ.get('CLAUDE_PROJECT_DIR')
                     project_dir,status=resolve_project_directory(project_value)
                     session=payload.get('session_id')
-                    validated_session=session if isinstance(session,str) else None
                     recorded=log('INFO','hook_observed',raw_payload=None if args.hook == 'PostCompact' else payload,
                         session_id=session if isinstance(session,str) else None,
                         claude_project_dir=project_value,

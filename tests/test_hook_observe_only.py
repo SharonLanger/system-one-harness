@@ -87,7 +87,7 @@ def test_full_input_and_metadata_without_dispatch_or_optional_prerequisites(tmp_
     assert observed['would_invoke_dispatcher'].endswith('.dispatch_hook')
     assert observed['event_dispatcher'].endswith('.dispatch_user_prompt_submit')
     final = records[-1]
-    assert final['session_id'] == 'unique'
+    assert final['session_id'] is None
     assert final['outcome'] == 'observed' and final['reason'] == 'observe_only'
     assert final['stdout_bytes_written'] == 0 and final['response_present'] is False
     assert not proc.stderr

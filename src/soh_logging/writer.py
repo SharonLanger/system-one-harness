@@ -73,7 +73,10 @@ class LogWriter:
                         time.sleep(min(0.005, max(0, deadline - time.monotonic())))
                 destination.parent.mkdir(mode=0o700, exist_ok=True)
                 self._check_directory(destination.parent)
-                fd = os.open(destination, os.O_CREAT | os.O_APPEND | os.O_WRONLY |
+                # A preexisting FIFO must fail instead of blocking in open()
+                # before the regular-file check can run. Regular files ignore
+                # O_NONBLOCK; fstat still rejects other incompatible objects.
+                fd = os.open(destination, os.O_CREAT | os.O_APPEND | os.O_WRONLY | os.O_NONBLOCK |
                              getattr(os, 'O_NOFOLLOW', 0), 0o600)
                 try:
                     if not stat.S_ISREG(os.fstat(fd).st_mode):

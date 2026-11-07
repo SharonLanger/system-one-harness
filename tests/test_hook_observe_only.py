@@ -203,7 +203,7 @@ raise SystemExit(main(['--hook','UserPromptSubmit','--observe-only']))
     assert proc.returncode == 0 and proc.stdout == '' and proc.stderr == ''
     records = [json.loads(line) for line in path.read_text().splitlines()]
     assert next(r for r in records if r['event'] == 'observation_input_received')['details']['raw_input'] == raw
-    assert all(r['pid'] and r['parent_pid'] for r in records)
+    assert all(r['pid'] and r['correlation_id'] for r in records)
     assert records[-1]['details']['outcome'] == 'observed'
 
 

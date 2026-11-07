@@ -88,6 +88,8 @@ The Python suite includes unit, integration, system, and existing active tests. 
 
 ### First proof of concept: method context
 
+The public hook gateway reads one JSON event from stdin. It validates the hook name and event, dispatches `UserPromptSubmit` or `PostCompact`, and writes only the hook protocol response to stdout. The current prompt flow resolves one production TypeScript file, asks the model to classify the requested action and choose a callable, then extracts bounded method context. A session store suppresses repeated enrichment until compaction. Diagnostics go to stderr and `.logs/YYYY-MM-DD/HH-00.jsonl` in UTC; session state uses files under `logs/session-state/` for now. Installed copies use the user-local state directory, or an absolute `SOH_LOG_ROOT` override. Logs may contain prompts, model responses, or source code, so handle them as potentially sensitive.
+
 The first flow demonstrates the pieces working together. For a request such as:
 
 ```text

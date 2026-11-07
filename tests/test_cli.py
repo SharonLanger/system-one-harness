@@ -128,6 +128,7 @@ def test_installed_console_command_uses_selected_environment(tmp_path):
     launcher = environment / 'bin/system-one-harness'
     env = dict(os.environ)
     env.pop('PYTHONPATH', None)
+    env['SOH_LOG_ROOT'] = str(tmp_path / '.logs')
     def run(*args, raw=None):
         return subprocess.run([str(launcher), *args], input=raw, text=True,
                               capture_output=True, timeout=10, cwd=tmp_path, env=env)

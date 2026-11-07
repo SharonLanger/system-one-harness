@@ -1,8 +1,10 @@
 """PostCompact actions. Logging never calls models or code extraction."""
 from hooks.contracts import Noop, Failure
 from hooks.session_state import save_event
+from soh_logging import ComponentName, ComponentType, component_scope
 
 
+@component_scope(ComponentType.DISPATCHER, ComponentName.POST_COMPACT)
 def dispatch_post_compact(envelope, args, logger, *, session_store=None):
     if not getattr(args, 'log_state', False):
         return Noop('unsupported_action', feature_id='session_state')

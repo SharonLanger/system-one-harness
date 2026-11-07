@@ -28,11 +28,11 @@ import log_utils
 spec = json.loads(os.environ['FIRST_FLOW_SPEC'])
 from hooks import session_state
 session_state.ROOT = __import__('pathlib').Path(os.environ['FIRST_FLOW_STATE_ROOT'])
-# Keep the compiled helper at the runtime root while isolating all persisted state.
+# Isolate SQLite state independently of the source extraction helper.
 original_inspect = session_state.inspect_and_save_event
 def isolated_inspect(*args, **kwargs):
-    kwargs['logs_root'] = session_state.ROOT
-    kwargs['helper'] = os.environ['FIRST_FLOW_HELPER']
+    if not spec.get('use_default_state'):
+        kwargs['database_path'] = session_state.ROOT / 'session-state.sqlite3'
     return original_inspect(*args, **kwargs)
 from flows import first_method_context
 first_method_context.inspect_and_save_event = isolated_inspect
@@ -76,7 +76,8 @@ raise SystemExit(main(sys.argv[1:]))
 '''
 
 
-def gateway(h, tmp_path, *, prompt=PROMPT, spec=None, extra=(), event_change=None, cwd=None, real=True):
+def gateway(h, tmp_path, *, prompt=PROMPT, spec=None, extra=(), event_change=None, cwd=None, real=True,
+            state_root=None):
     event = {'hook_event_name': 'UserPromptSubmit', 'session_id': 'subprocess-session',
              'cwd': str(cwd or h.root), 'transcript_path': 'unused.jsonl', 'prompt': prompt}
     event.update(event_change or {})
@@ -85,8 +86,7 @@ def gateway(h, tmp_path, *, prompt=PROMPT, spec=None, extra=(), event_change=Non
     calls = tmp_path / 'calls.jsonl'
     env = {**os.environ, 'PYTHONPATH': str(ROOT / 'src'),
            'FIRST_FLOW_SPEC': json.dumps(fixed), 'FIRST_FLOW_LOG': str(log),
-           'FIRST_FLOW_CALLS': str(calls), 'FIRST_FLOW_STATE_ROOT': str(tmp_path / 'state'),
-           'FIRST_FLOW_HELPER': str(ROOT / 'build/typescript/session-state-cli.js')}
+           'FIRST_FLOW_CALLS': str(calls), 'FIRST_FLOW_STATE_ROOT': str(state_root or tmp_path / 'state')}
     command = [sys.executable, '-c', BOOTSTRAP, '--hook', 'UserPromptSubmit',
                '--repository-root', str(h.root), '--deadline', '30', *(['--real'] if real else []), *extra]
     result = subprocess.run(command, input=json.dumps(event).encode(), capture_output=True,
@@ -275,10 +275,30 @@ def test_H08_existing_handler_injection_and_actual_default_registration(h, golde
 def test_session_duplicate_gateway_returns_zero_bytes_without_state_change(h, tmp_path, golden):
     first, _, _ = gateway(h, tmp_path)
     assert json.loads(first.stdout)['hookSpecificOutput']['additionalContext'] == golden
-    path = tmp_path / 'state/session-state/subprocess-session.jsonl'
+    path = tmp_path / 'state/session-state.sqlite3'
     before = path.read_bytes()
     second, records, _ = gateway(h, tmp_path)
     assert second.returncode == 0 and second.stdout == b''
     assert path.read_bytes() == before
-    assert len(before.splitlines()) == 1
+    with __import__('sqlite3').connect(path) as db:
+        assert db.execute('SELECT count(*) FROM session_events').fetchone()[0] == 1
     assert any(r['event'] == 'enrichment_skipped' for r in records)
+
+
+def test_default_database_path_with_distinct_hook_directories(h,tmp_path,golden):
+    from tests.support.sqlite_state import rows
+    install=tmp_path.resolve()/'synthetic-installation'
+    shell=tmp_path.resolve()/'shell-cwd';event_cwd=tmp_path.resolve()/'event-cwd'
+    for directory in (install,shell,event_cwd):directory.mkdir()
+    assert len({install,shell,event_cwd,h.root.resolve()})==4
+    kwargs=dict(cwd=shell,event_change={'cwd':str(event_cwd)},
+                state_root=install,spec={'use_default_state':True})
+    first,_,_=gateway(h,tmp_path,**kwargs)
+    assert first.returncode==0 and json.loads(first.stdout)['hookSpecificOutput']['additionalContext']==golden
+    second,_,_=gateway(h,tmp_path,**kwargs)
+    assert second.returncode==0 and second.stdout==b''
+    path=install/'.soh/session-state.sqlite3'
+    assert len(rows(path))==1
+    assert list(tmp_path.rglob('.soh'))==[install/'.soh']
+    assert not any((root/'.soh').exists() for root in (shell,event_cwd,h.root))
+    assert list(tmp_path.rglob('session-state.sqlite3'))==[path]

@@ -7,9 +7,9 @@ Connects Claude Code hooks to System One Harness through the existing CLI gatewa
 ## Hooks
 
 - `UserPromptSubmit`: runs the existing prompt-context flow.
-- `PostCompact`: runs `hook --hook PostCompact --log-state` after manual or automatic compaction, appending a `PostCompact` event and timestamp to the same session's JSONL log.
+- `PostCompact`: runs `hook --hook PostCompact --log-state` after manual or automatic compaction, appending one shared `PostCompact` event and timestamp to the session’s SQLite history.
 
-Build the TypeScript helper with `npm --prefix typescript-helper run build`, ensure Node is on PATH, and configure `LAYA_CONTEXT_ROUTER_CLI` to point to the installed SOH executable. Session logs live under the SOH checkout's `logs/session-state/`. See `../../docs/post-compact/README.md` for logging behavior and the manual smoke check.
+Build the TypeScript helper with `npm --prefix typescript-helper run build`, ensure Node is on PATH, and configure `LAYA_CONTEXT_ROUTER_CLI` to point to the installed SOH executable. Sensitive session state lives at `<SOH root>/.soh/session-state.sqlite3`, independent of the target project/cwd. Session persistence uses Python only; Node is used by source extraction. Old JSONL is not imported or deleted. No automatic retention applies. Never commit or upload the database or its sidecars. See [session storage](../../docs/session-state.md).
 
 ## Required versioning rule
 

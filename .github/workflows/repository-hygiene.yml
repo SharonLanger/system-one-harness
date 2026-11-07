@@ -7,7 +7,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python scripts/check_repository_hygiene.py
+      - name: Inspect candidate tree and introduced history
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BASE: ${{ github.event.before }}
+          CANDIDATE: ${{ github.sha }}
+        run: |
+          python scripts/check_repository_hygiene.py --tree "$CANDIDATE"
+          if [ "$EVENT_NAME" = pull_request ]; then
+            python scripts/check_repository_hygiene.py --range "$PR_BASE" "$PR_HEAD"
+          elif [ "$PUSH_BASE" != 0000000000000000000000000000000000000000 ]; then
+            python scripts/check_repository_hygiene.py --range "$PUSH_BASE" "$CANDIDATE"
+          else
+            python scripts/check_repository_hygiene.py --range origin/main "$CANDIDATE"
+          fi

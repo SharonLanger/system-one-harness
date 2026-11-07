@@ -3,11 +3,20 @@ from tests.support.fake_laya import action_answer, method_answer, choice_respons
 
 SOURCE = 'export function calculateTotal(value: number) { return value + 1; }\n'
 PROMPT = 'Explain `sample.ts`: calculateTotal'
+MODEL_RESPONSE_SENTINEL = 'SOH_MODEL_RESPONSE_PRIVATE_MARKER'
 
 
 def scenario_steps(scenario, source):
     if scenario in {'missing', 'empty', 'malformed'}:
         return []
+    if scenario == 'sensitive':
+        def marked(step):
+            def answer(text,questions):
+                result=step(text,questions)
+                result['synthetic_private_response']=MODEL_RESPONSE_SENTINEL
+                return result
+            return answer
+        return [marked(action_answer),marked(method_answer)]
     if scenario == 'unsupported':
         return [lambda text, questions: {'answers': choice_response(
             'requested_action', 'modify_code', questions['requested_action']['criteria'])}]

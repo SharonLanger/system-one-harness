@@ -18,10 +18,12 @@ ROOT=Path(__file__).resolve().parents[3]
 def launcher(tmp_path):
     root=tmp_path.resolve();project=root/'project';project.mkdir();(project/'sample.ts').write_text(SOURCE)
     directory=root/'state';path=directory/'session-state.sqlite3'
-    def launch(*,hook='UserPromptSubmit',session='one',entry='cli',env_extra=None,asynchronous=False,pass_fds=()):
+    def launch(*,hook='UserPromptSubmit',session='one',entry='cli',env_extra=None,asynchronous=False,pass_fds=(),
+               scenario='success',payload_change=None):
         event={'hook_event_name':hook,'session_id':session,'cwd':str(project),
                'transcript_path':'TRANSCRIPT_SENTINEL','prompt':PROMPT,'trigger':'manual','compact_summary':'SUMMARY_SENTINEL'}
-        command=[sys.executable,'-m','tests.support.cli_runner',entry,'empty' if hook=='PostCompact' else 'success',
+        event.update(payload_change or {})
+        command=[sys.executable,'-m','tests.support.cli_runner',entry,'empty' if hook=='PostCompact' else scenario,
             str(project),str(directory),'--hook',hook,'--repository-root',str(project),'--deadline','30',
             '--log-state' if hook=='PostCompact' else '--real']
         env={**os.environ,'PYTHONPATH':os.pathsep.join([str(ROOT/'src'),str(ROOT)]),**(env_extra or {})}
@@ -96,3 +98,41 @@ def test_killed_after_commit_before_gateway_emission(launcher):
             process.communicate(timeout=5)
         for descriptor in (checkpoint_read,checkpoint_write,release_read,release_write):
             if descriptor is not None:os.close(descriptor)
+
+
+def test_persisted_payload_whitelist_excludes_every_sensitive_input(launcher):
+    from tests.support.offline_scenarios import MODEL_RESPONSE_SENTINEL
+    from tests.support.sqlite_state import history
+    from tests.support.state_assertions import assert_no_payload_leaks
+    launch,path,project=launcher
+    prompt_marker='SOH_PROMPT_PRIVATE_MARKER';source_marker='SOH_SOURCE_PRIVATE_MARKER'
+    transcript_marker='SOH_TRANSCRIPT_PRIVATE_MARKER';summary_marker='SOH_SUMMARY_PRIVATE_MARKER'
+    source=f'export function calculateTotal(value: number) {{ /* {source_marker} */ return value + 1; }}\n'
+    (project/'sample.ts').write_text(source)
+    result=launch(scenario='sensitive',payload_change={'prompt':PROMPT+' '+prompt_marker,
+        'transcript_path':transcript_marker})
+    if result.returncode!=0 or not result.stdout:
+        pytest.fail('synthetic sensitive-input hook did not return context',pytrace=False)
+    # Confirm the scripted response marker was actually supplied by the model
+    # boundary; existing diagnostic logs intentionally contain model responses.
+    if MODEL_RESPONSE_SENTINEL not in result.stderr:
+        pytest.fail('scripted model response marker was not exercised',pytrace=False)
+    compact=launch(hook='PostCompact',payload_change={'compact_summary':summary_marker,
+        'transcript_path':transcript_marker})
+    assert compact.returncode==0 and compact.stdout==''
+    events=history(path,'one')
+    assert_no_payload_leaks({'persisted_events':json.dumps(events,ensure_ascii=False)},
+        [prompt_marker,source_marker,transcript_marker,MODEL_RESPONSE_SENTINEL,summary_marker])
+    if len(events)!=2:
+        pytest.fail('unexpected persisted event count',pytrace=False)
+    expected_keys={'event_id','session_id','hook_name','source','type','timestamp','payload'}
+    assert all(set(item)==expected_keys for item in events)
+    assert events[0]['source']=={'kind':'flow','name':'first_method_context'}
+    assert events[0]['hook_name']=='UserPromptSubmit' and events[0]['type']=='context_enriched'
+    expected={'files':[{'filePath':str((project/'sample.ts').resolve()),'methodNames':['calculateTotal'],
+        'methods':[{'name':'calculateTotal','signature':'export function calculateTotal(value: number)',
+                    'startLine':1,'endLine':1}]}]}
+    if events[0]['payload']!=expected:
+        pytest.fail('persisted enrichment payload differs from exact metadata whitelist',pytrace=False)
+    assert events[1]['hook_name']=='PostCompact' and events[1]['type']=='PostCompact'
+    assert events[1]['source']=={'kind':'hook','name':'PostCompact'} and events[1]['payload']=={}

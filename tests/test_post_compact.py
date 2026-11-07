@@ -72,7 +72,17 @@ def test_adapter_errors_and_lock_deadline(tmp_path):
     save_event('id',EVENT,deadline=monotonic()+10,database_path=path)
     with sqlite3.connect(path,isolation_level=None) as db:
         db.execute('BEGIN IMMEDIATE')
-        with pytest.raises(TimeoutError):save_event('id',EVENT,deadline=monotonic()+0.05,database_path=path)
+        script="""from pathlib import Path
+from time import monotonic
+from hooks.session_state import save_event
+try:
+ save_event('id',{'source':{'kind':'hook','name':'PostCompact'},'hook_name':'PostCompact','type':'PostCompact','payload':{}},deadline=monotonic()+0.05,database_path=Path(__import__('sys').argv[1]))
+except TimeoutError:raise SystemExit(0)
+raise SystemExit(2)
+"""
+        result=subprocess.run([sys.executable,'-c',script,str(path)],capture_output=True,
+            env={**__import__('os').environ,'PYTHONPATH':str(ROOT/'src')},timeout=5)
+        assert result.returncode==0
         db.rollback()
     save_event('id',EVENT,deadline=monotonic()+10,database_path=path)
 

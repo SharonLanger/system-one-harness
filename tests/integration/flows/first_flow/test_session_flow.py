@@ -180,3 +180,36 @@ def test_memory_store_relevance_matches_sqlite(tmp_path):
         real=history(path,flow=name)
         strip=lambda events:[{k:e[k] for k in ('source','hook_name','type','payload')} for e in events]
         assert strip(loaded)==strip(real)
+
+
+@pytest.mark.parametrize('failure',['oversized_callback','corrupt_history'])
+def test_real_storage_failures_do_not_leak_across_caller_channels(h,tmp_path,capfd,failure):
+    from dataclasses import replace
+    from hashlib import sha256
+    from types import SimpleNamespace
+    import sqlite3
+    from tests.support.sqlite_state import METHOD,rows,transact
+    from tests.support.state_assertions import assert_no_payload_leaks,capture_state_error
+    marker='SOH_STORE_FAILURE_PRIVATE_MARKER'
+    path=tmp_path.resolve()/'state.sqlite3'
+    assert transact(path,'offline-session').allow
+    selected=replace(METHOD,signature=marker*3000)
+    if failure=='corrupt_history':
+        with sqlite3.connect(path) as db:
+            db.execute('UPDATE session_events SET payload_json=?',('{'+marker,))
+    fingerprint=lambda:sha256(json.dumps(rows(path),ensure_ascii=False).encode()).hexdigest()
+    before=fingerprint();captured_logs=[]
+    # Exercise the public failure and then the actual enrichment caller with
+    # the same real failing database/event, without replacing the store oracle.
+    error_type,error_text=capture_state_error(lambda:transact(path,'offline-session',method=selected))
+    store=SimpleNamespace(inspect_and_save_event=lambda *a,**kw:
+        session_state.inspect_and_save_event(*a,database_path=path,**kw))
+    result=flow.finalize_enrichment(h.request(deadline_at=monotonic()+20),
+        lambda *args,**details:captured_logs.append((args,details)),selected,session_store=store)
+    captured=capfd.readouterr()
+    assert_no_payload_leaks({'stdout':captured.out,'stderr':captured.err,
+        'exception':error_text,'result':repr(result),'logger_arguments':repr(captured_logs)},[marker])
+    assert captured.out==captured.err=='' and error_type is ValueError
+    assert result.allow and result.reason=='state_unavailable'
+    assert len(captured_logs)==1 and captured_logs[0][0][1]=='session_state_enrichment_failed'
+    assert fingerprint()==before and len(rows(path))==1

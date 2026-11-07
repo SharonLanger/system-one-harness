@@ -50,10 +50,9 @@ def tree_entries(ref):
         if entry:
             metadata, path = entry.split(b'\t', 1)
             mode, kind, oid = metadata.split()
-            if kind == b'blob':
-                yield path.decode('utf-8', 'surrogateescape'), oid.decode('ascii')
-            elif kind != b'commit':
+            if kind not in (b'blob', b'commit'):
                 raise ValueError('git_object_type_failed')
+            yield path.decode('utf-8', 'surrogateescape'), oid.decode('ascii'), mode
 
 
 def index_entries():
@@ -63,8 +62,7 @@ def index_entries():
             mode, oid, stage = metadata.split()
             if stage != b'0':
                 raise ValueError('unmerged_index')
-            if mode != b'160000':
-                yield path.decode('utf-8', 'surrogateescape'), oid.decode('ascii')
+            yield path.decode('utf-8', 'surrogateescape'), oid.decode('ascii'), mode
 
 
 def header(oid):
@@ -144,11 +142,13 @@ def main(argv=None):
         entries = (tree_entries(args.tree) if args.tree else introduced(*args.range) if args.range
                    else outgoing(args.push, sys.stdin) if args.push else index_entries())
         inspected, reported, bad = {}, set(), False
-        for path, oid in entries:
+        for path, oid, mode in entries:
             rule = 'prohibited_path' if prohibited(path) else None
-            if oid not in inspected:
+            # Gitlinks still obey path rules. Their submodule commits need not
+            # be local objects, and their contents are outside this repository.
+            if mode != b'160000' and oid not in inspected:
                 inspected[oid] = header(oid) == _SQLITE
-            if inspected[oid]:
+            if mode != b'160000' and inspected[oid]:
                 rule = 'sqlite_header' if rule is None else rule + '+sqlite_header'
             if rule and (path, rule) not in reported:
                 print('Repository hygiene: ' + rule + ' ' + json.dumps(path, ensure_ascii=True), file=sys.stderr)

@@ -94,17 +94,70 @@ def test_competing_processes(tmp_path,variant):
     finally: finish(processes,queue)
 
 
-def test_competitor_observes_committed_history(tmp_path):
-    path=tmp_path/'state.sqlite3';ctx=mp.get_context('spawn');queue=ctx.Queue()
-    held=ctx.Event();release=ctx.Event()
-    a=ctx.Process(target=worker,args=(str(path),None,queue,'s','calculate',held,release))
-    b=ctx.Process(target=worker,args=(str(path),None,queue))
+def contending_worker(path, progress, result, decision_entered, deny=False):
+    """Observe a real BUSY, then trace the real budgeted acquisition attempt."""
+    original=state._Store.execute
+    calls=[];observed=[]
+    def execute(self,sql,parameters=()):
+        if sql=='BEGIN IMMEDIATE':
+            self.connection.execute('PRAGMA busy_timeout=0')
+            try:
+                self.connection.execute(sql)
+            except sqlite3.OperationalError as exc:
+                if exc.sqlite_errorcode!=sqlite3.SQLITE_BUSY:raise
+                progress.send('busy')
+            else:
+                raise AssertionError('holder was not locked')
+            self.connection.set_trace_callback(
+                lambda statement:progress.send('acquiring') if statement=='BEGIN IMMEDIATE' else None)
+            try:return original(self,sql,parameters)
+            finally:self.connection.set_trace_callback(None)
+        return original(self,sql,parameters)
+    state._Store.execute=execute
     try:
-        a.start(); assert held.wait(10)
-        b.start(); release.set()
-        assert sorted([queue.get(timeout=30),queue.get(timeout=30)])==[('ok',False),('ok',True)]
-        assert len(rows(path))==1
-    finally: release.set(); finish([a,b],queue)
+        def decide(events):
+            from flows.first_method_context_utils import build_enrichment_event,decide_enrichment
+            calls.append(1);decision_entered.set()
+            observed.extend(e['type'] for e in events)
+            decision=SimpleNamespace(allow=False) if deny else decide_enrichment(events,METHOD)
+            return decision,build_enrichment_event(METHOD) if decision.allow else None
+        decision=transact(Path(path),callback=decide)
+        result.send(('ok',decision.allow,len(calls),tuple(observed)))
+    except BaseException as exc:result.send(('error',type(exc).__name__,len(calls)))
+    finally:progress.close();result.close()
+
+
+def successful_contention(path,holder_kind):
+    save(path)
+    ctx=mp.get_context('spawn');queue=ctx.Queue();held=ctx.Event();release=ctx.Event()
+    decision_entered=ctx.Event();progress,progress_send=ctx.Pipe(duplex=False)
+    result,result_send=ctx.Pipe(duplex=False)
+    a=(ctx.Process(target=worker,args=(str(path),None,queue,'s','calculate',held,release))
+       if holder_kind=='enrich' else ctx.Process(target=compact_worker,args=(str(path),held,release,queue)))
+    b=ctx.Process(target=contending_worker,args=(str(path),progress_send,result_send,decision_entered,holder_kind=='compact'))
+    try:
+        a.start();assert held.wait(10)
+        b.start()
+        assert progress.poll(10) and progress.recv()=='busy'
+        assert progress.poll(10) and progress.recv()=='acquiring'
+        # B has actually encountered SQLite BUSY and entered its real bounded
+        # retry while A remains held. A bounded pipe observation proves no
+        # callback/completion before release; no sleep establishes ordering.
+        assert not result.poll(0.05) and not decision_entered.is_set()
+        assert a.is_alive() and not release.is_set()
+        release.set()
+        assert queue.get(timeout=20)==('ok',True if holder_kind=='enrich' else 'compact')
+        assert result.poll(20)
+        expected=('PostCompact','context_enriched') if holder_kind=='enrich' else ('PostCompact','PostCompact')
+        assert result.recv()==('ok',False,1,expected)
+        assert decision_entered.is_set() and len(rows(path))==2
+    finally:
+        release.set();finish([a,b],queue)
+        for pipe in (progress,progress_send,result,result_send):pipe.close()
+
+
+def test_competitor_observes_committed_history(tmp_path):
+    successful_contention(tmp_path/'state.sqlite3','enrich')
 
 
 def compact_worker(path, acquired, release, queue):
@@ -150,6 +203,14 @@ def crash_worker(path, checkpoint, release, committed):
         checkpoint.set();release.wait(15)
 
 
+def reader_worker(path,result):
+    try:
+        events=history(Path(path))
+        result.send(('ok',len(events),tuple(e['type'] for e in events)))
+    except BaseException as exc:result.send(('error',type(exc).__name__))
+    finally:result.close()
+
+
 @pytest.mark.parametrize('committed',[False,True])
 def test_process_exit_checkpoint(tmp_path,committed):
     path=tmp_path/'state.sqlite3';save(path)
@@ -158,7 +219,14 @@ def test_process_exit_checkpoint(tmp_path,committed):
     try:
         process.start();assert checkpoint.wait(15)
         process.terminate();process.join(timeout=5)
-        assert len(history(path))==1+int(committed)
+        assert not process.is_alive()
+        result,sender=ctx.Pipe(duplex=False)
+        reader=ctx.Process(target=reader_worker,args=(str(path),sender))
+        try:
+            reader.start();assert result.poll(10)
+            assert result.recv()==('ok',1+int(committed),('PostCompact',)*(1+int(committed)))
+            reader.join(timeout=5);assert reader.exitcode==0
+        finally:finish([reader]);result.close();sender.close()
         assert transact(path).allow
     finally: finish([process])
 
@@ -169,29 +237,33 @@ def test_expired_deadline(tmp_path):
     assert not path.parent.exists()
 
 
+def deadline_worker(path,result):
+    calls=[]
+    try:
+        transact(Path(path),callback=lambda h:calls.append(1),deadline=monotonic()+0.05)
+        result.send(('unexpected_success',len(calls)))
+    except BaseException as exc:result.send((type(exc).__name__,len(calls)))
+    finally:result.close()
+
+
 def test_real_lock_deadline_and_callback_count(tmp_path):
-    path=tmp_path/'state.sqlite3';save(path);calls=[]
-    with sqlite3.connect(path,isolation_level=None) as db:
-        db.execute('BEGIN IMMEDIATE')
-        with pytest.raises(TimeoutError):
-            transact(path,callback=lambda h:calls.append(h),deadline=monotonic()+0.05)
-        db.rollback()
-    assert calls==[] and len(rows(path))==1
-    assert transact(path).allow
+    path=tmp_path/'state.sqlite3';save(path)
+    ctx=mp.get_context('spawn');result,sender=ctx.Pipe(duplex=False)
+    contender=ctx.Process(target=deadline_worker,args=(str(path),sender))
+    try:
+        with sqlite3.connect(path,isolation_level=None) as db:
+            db.execute('BEGIN IMMEDIATE');contender.start()
+            # Parent bound makes a broken internal timeout a failure, not a hang.
+            assert result.poll(5),'deadline contender exceeded outer process bound'
+            assert result.recv()==('TimeoutError',0)
+            contender.join(timeout=5);assert not contender.is_alive()
+            db.rollback()
+        assert len(rows(path))==1 and transact(path).allow
+    finally:finish([contender]);result.close();sender.close()
 
 
 def test_lock_release_within_budget(tmp_path):
-    path=tmp_path/'state.sqlite3';save(path)
-    ctx=mp.get_context('spawn');held=ctx.Event();release=ctx.Event();q=ctx.Queue()
-    p=ctx.Process(target=compact_worker,args=(str(path),held,release,q))
-    try:
-        p.start();assert held.wait(10)
-        # Releasing a coordinated holder allows one decision, without replay.
-        release.set();calls=[]
-        def deny(h): calls.append(len(h));return SimpleNamespace(allow=False),None
-        assert not transact(path,callback=deny).allow
-        assert q.get(timeout=20)==('ok','compact') and len(calls)==1
-    finally: release.set();finish([p],q)
+    successful_contention(tmp_path/'state.sqlite3','compact')
 
 
 @pytest.mark.parametrize('phase',['read','callback','insert','commit'])

@@ -13,6 +13,7 @@ from types import SimpleNamespace
 import pytest
 from hooks import session_state as state
 from tests.support.sqlite_state import COMPACT, event, history, rows, save, transact
+from tests.support.state_assertions import assert_no_payload_leaks,capture_state_error
 
 
 @pytest.fixture
@@ -89,29 +90,44 @@ def test_invalid_json_never_coerced(db_path,payload,capsys):
 
 @pytest.mark.parametrize('size',[65536,65537])
 @pytest.mark.parametrize('prefix',['','😀','"\\\n'])
-def test_exact_utf8_boundary(db_path,size,prefix,capsys):
+def test_exact_utf8_boundary(db_path,size,prefix,capfd):
+    marker='SOH_REJECTED_PAYLOAD_PRIVATE'
+    prefix=marker+prefix
+    error_text='';error_type=None
     base={'text':prefix};overhead=len(json.dumps(base,ensure_ascii=False,separators=(',',':')).encode())
     payload={'text':prefix+'x'*(size-overhead)}
     encoded=json.dumps(payload,ensure_ascii=False,allow_nan=False,separators=(',',':')).encode()
-    assert len(encoded)==size
+    byte_count=len(encoded)
+    assert byte_count==size
     if size==65536:
-        save(db_path,event(payload=payload));assert history(db_path)[0]['payload']==payload
+        save(db_path,event(payload=payload))
+        if history(db_path)[0]['payload']!=payload:
+            pytest.fail('accepted payload did not round-trip',pytrace=False)
     else:
-        with pytest.raises(ValueError,match='too_large'):save(db_path,event(payload=payload))
+        error_type,error_text=capture_state_error(lambda:save(db_path,event(payload=payload)))
         assert not db_path.exists()
-    assert capsys.readouterr().out==''
+    captured=capfd.readouterr()
+    assert_no_payload_leaks({'stdout':captured.out,'stderr':captured.err,'exception':error_text},[marker])
+    assert captured.out==captured.err==''
+    if size==65537:
+        assert error_type is ValueError and 'too_large' in error_text
 
 
-def test_oversize_callback_rollback_and_sql_constraint(db_path):
+def test_oversize_callback_rollback_and_sql_constraint(db_path,capfd):
+    marker='SOH_OVERSIZED_CALLBACK_PRIVATE'
     save(db_path);before=rows(db_path)
-    with pytest.raises(ValueError):
-        transact(db_path,callback=lambda h:(SimpleNamespace(allow=True),event(payload={'x':'SENTINEL'*10000})))
+    callback_type,callback_text=capture_state_error(lambda:
+        transact(db_path,callback=lambda h:(SimpleNamespace(allow=True),event(payload={'x':marker*10000}))))
     assert rows(db_path)==before
     with sqlite3.connect(db_path) as db:
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(sqlite3.IntegrityError) as sql_error:
             db.execute('INSERT INTO session_events(session_id,hook_name,event_type,recorded_at,payload_json) VALUES (?,?,?,?,?)',
                        ('s','h','e','t','x'*65537))
     assert rows(db_path)==before
+    captured=capfd.readouterr()
+    assert_no_payload_leaks({'stdout':captured.out,'stderr':captured.err,
+        'exception':callback_text,'sql_exception':repr(sql_error.value)},[marker])
+    assert captured.out==captured.err=='' and callback_type is ValueError
 
 
 def test_sql_injection_strings_remain_data(db_path):
@@ -231,3 +247,66 @@ raise SystemExit(2)
     try:
         assert subprocess.run([sys.executable,'-c',command,str(directory/'state.sqlite3')],env={**os.environ,'PYTHONPATH':str(state.ROOT/'src')},capture_output=True,timeout=10).returncode==0
     finally:directory.chmod(0o700)
+
+
+@pytest.mark.parametrize('phase',['save','allow','deny','callback','validation','sql','commit'])
+def test_real_connections_close_once_on_success_and_failure(db_path,monkeypatch,phase):
+    save(db_path)
+    if phase=='deny':assert transact(db_path).allow
+    before_count=len(rows(db_path));created=[];real_factory=state.sqlite3.connect
+    class RecordedConnection(sqlite3.Connection):
+        close_count=0
+        def close(self):
+            self.close_count+=1
+            return super().close()
+        def execute(self,sql,parameters=()):
+            if (phase=='sql' and sql.startswith('INSERT')) or (phase=='commit' and sql=='COMMIT'):
+                # A real SQL failure at the desired phase, keeping SQLite's
+                # actual transaction and rollback/close behavior active.
+                return super().execute('SELECT absent_column FROM session_events')
+            return super().execute(sql,parameters)
+    def connect(*args,**kwargs):
+        connection=real_factory(*args,factory=RecordedConnection,**kwargs)
+        created.append(connection)
+        return connection
+    monkeypatch.setattr(state.sqlite3,'connect',connect)
+    def fail(history):raise ValueError('synthetic_callback_failure')
+    def invalid(history):return SimpleNamespace(allow=True),event(payload={'unsupported':set()})
+    if phase in ('callback','validation','sql','commit'):
+        with pytest.raises((ValueError,RuntimeError)):
+            transact(db_path,callback=fail if phase=='callback' else invalid if phase=='validation' else None)
+    elif phase=='save':save(db_path)
+    else:assert transact(db_path).allow==(phase=='allow')
+    assert len(created)==1 and created[0].close_count==1
+    with pytest.raises(sqlite3.ProgrammingError,match='closed'):
+        created[0].execute('SELECT 1')
+    monkeypatch.setattr(state.sqlite3,'connect',real_factory)
+    expected=before_count+int(phase in ('save','allow'))
+    assert len(rows(db_path))==expected
+    save(db_path)
+    assert len(rows(db_path))==expected+1
+
+
+def test_shared_references_roundtrip_but_nested_cycles_fail(db_path):
+    shared={'values':[1,None,{'text':'Unicode שלום'}]}
+    payload={'left':shared,'right':shared}
+    assert payload['left'] is payload['right']
+    save(db_path,event(payload=payload))
+    loaded=history(db_path)[0]['payload']
+    assert loaded==payload and loaded['left'] is not loaded['right']
+    loaded['left']['values'].clear()
+    assert history(db_path)[0]['payload']==payload
+    nested={'branch':{'children':[]}}
+    nested['branch']['children'].append(nested['branch'])
+    with pytest.raises(ValueError,match='payload'):save(db_path,event(payload=nested))
+    assert len(rows(db_path))==1
+
+
+def test_append_does_not_scan_corrupt_history_under_fresh_contract(db_path):
+    save(db_path,event())
+    with sqlite3.connect(db_path) as db:
+        db.execute('UPDATE session_events SET payload_json=?',('{synthetic_corruption',))
+    # Unlike the obsolete JSONL adapter, a plain append need not scan history.
+    save(db_path)
+    assert len(rows(db_path))==2
+    with pytest.raises(ValueError,match='invalid_session_state_history'):history(db_path)

@@ -127,7 +127,8 @@ def test_bounded_header_and_deduplicated_blob_reads(repo,monkeypatch):
     assert hygiene.header(oid)==b'x'*16 and calls==[16]
     counts=[]
     monkeypatch.setattr(hygiene,'header',lambda value:(counts.append(value) or b'SQLite format 3\0'))
-    monkeypatch.setattr(hygiene,'introduced',lambda *a:iter([('one',oid),('two',oid),('one',oid)]))
+    monkeypatch.setattr(hygiene,'introduced',lambda *a:iter([
+        ('one',oid,b'100644'),('two',oid,b'100644'),('one',oid,b'100644')]))
     assert hygiene.main(['--range','base','head'])==1 and counts==[oid]
 
 
@@ -219,3 +220,24 @@ def test_new_branch_clean_range_accepted(repo):
     stdin=f'refs/heads/feature {head} refs/heads/feature {"0"*40}\n'.encode()
     assert check(repo,'--push','origin',stdin=stdin).returncode==0
     assert check(repo,'--range',base,'HEAD').returncode==0
+
+
+@pytest.mark.parametrize('name',['.soh','nested/.soh','nested/.soh/runtime',
+    'synthetic.db','synthetic.sqlite','synthetic.sqlite3']+
+    [f'nested/synthetic.{extension}-{suffix}' for extension in ('db','sqlite','sqlite3')
+     for suffix in ('journal','wal','shm')]+['safe-submodule'])
+def test_gitlink_paths_obey_index_tree_and_range_rules(repo,name):
+    base=git(repo,'rev-parse','HEAD').stdout.decode().strip()
+    # A gitlink's commit can legitimately be absent from the superproject's
+    # object database. Path enforcement must not depend on reading that object.
+    missing_oid='1'*40
+    assert git(repo,'cat-file','-e',missing_oid,check=False).returncode!=0
+    git(repo,'update-index','--add','--cacheinfo',f'160000,{missing_oid},{name}')
+    expected=0 if name=='safe-submodule' else 1
+    assert check(repo).returncode==expected
+    git(repo,'commit','-m','synthetic gitlink')
+    assert check(repo,'--tree','HEAD').returncode==expected
+    git(repo,'update-index','--force-remove','--',name)
+    git(repo,'commit','-m','remove synthetic gitlink')
+    assert check(repo,'--tree','HEAD').returncode==0
+    assert check(repo,'--range',base,'HEAD').returncode==expected

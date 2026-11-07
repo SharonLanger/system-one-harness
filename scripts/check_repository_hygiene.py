@@ -24,7 +24,7 @@ def prohibited(path):
         return False
     if '.soh' in parts or re.search(r'\.(db|sqlite|sqlite3)(-(journal|wal|shm))?$', p.name, re.I):
         return True
-    if '.idea' in parts or p.suffix == '.iml' or p.name == '.DS_Store':
+    if '.idea' in parts or '.logs' in parts or p.suffix == '.iml' or p.name == '.DS_Store':
         return True
     if parts[0] in {'logs', 'results', 'backup', 'build', 'dist', 'coverage', 'htmlcov'}:
         return True

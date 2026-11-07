@@ -1,19 +1,28 @@
-"""Read the existing log without creating or modifying it."""
+"""Read recent local records without modifying the log directory."""
 from collections import deque
 import sys
 
 
 def run(last):
-    from log_utils import LOG_PATH
+    import log_utils
 
     try:
-        with LOG_PATH.open(encoding='utf-8') as stream:
-            lines = deque(stream, maxlen=last)
+        if log_utils.LOG_PATH is not None:
+            paths = [log_utils.LOG_PATH]
+        else:
+            paths = sorted(log_utils.LOG_ROOT.glob('*/*.jsonl'))
+        if not paths:
+            print(f'No log file yet: {log_utils.LOG_ROOT}', file=sys.stderr)
+            return 0
+        lines = deque(maxlen=last)
+        for path in paths:
+            with path.open(encoding='utf-8') as stream:
+                lines.extend(stream)
     except FileNotFoundError:
-        print(f'No log file yet: {LOG_PATH}', file=sys.stderr)
+        print(f'No log file yet: {log_utils.LOG_PATH or log_utils.LOG_ROOT}', file=sys.stderr)
         return 0
     except (OSError, UnicodeError) as exc:
-        print(f'Cannot read log file {LOG_PATH}: {exc}', file=sys.stderr)
+        print(f'Cannot read log file {log_utils.LOG_PATH or log_utils.LOG_ROOT}: {exc}', file=sys.stderr)
         return 1
     sys.stdout.writelines(lines)
     return 0

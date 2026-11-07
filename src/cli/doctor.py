@@ -9,13 +9,13 @@ import sysconfig
 def run():
     import log_utils
 
-    log_path = log_utils.LOG_PATH
+    log_path = log_utils.LOG_PATH or log_utils.LOG_ROOT
     launcher = Path(sysconfig.get_path('scripts')) / 'system-one-harness'
     print(f'Python interpreter: {sys.executable}')
     print(f'Python version: {sys.version.split()[0]}')
     print(f'Package directory: {Path(log_utils.__file__).resolve().parent}')
     print(f'CLI install location (standard environment): {launcher}')
-    print(f'Log file: {log_path}')
+    print(f'Log location: {log_path}')
     python_ok = sys.version_info >= (3, 11)
     platform_ok = hasattr(signal, 'SIGALRM') and hasattr(signal, 'setitimer')
     print(f'Python >= 3.11: {"OK" if python_ok else "FAIL"}')
@@ -25,7 +25,7 @@ def run():
         while not probe.exists() and probe != probe.parent:
             probe = probe.parent
         if log_path.exists():
-            writable = log_path.is_file() and os.access(log_path, os.W_OK)
+            writable = os.access(log_path, os.W_OK | os.X_OK) if log_path.is_dir() else os.access(log_path, os.W_OK)
         else:
             writable = probe.is_dir() and os.access(probe, os.W_OK | os.X_OK)
         print(f'Log write access (estimate; no write attempted): {"OK" if writable else "FAIL"}')

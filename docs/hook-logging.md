@@ -1,9 +1,33 @@
 # Hook invocation logs
 
-In an editable installation the shared JSONL log is
-`<laya-context-router>/src/logs/debug.jsonl`. Records contain timestamp, PID,
-parent PID, invocation ID and hook name. Session ID is added when available.
-These logs include prompt text and supplied hook fields.
+In a source checkout, records are written to `.logs/YYYY-MM-DD/HH-00.jsonl`
+using UTC dates and full zero-padded hours. Installed copies use
+`$XDG_STATE_HOME/system-one-harness/.logs` (or
+`~/.local/state/system-one-harness/.logs`). Set `SOH_LOG_ROOT` to an absolute
+local path to override that location. `system-one-harness logs --last 20` reads
+recent records in file and append order. It does not create files.
+
+Existing `logs/debug.jsonl` files are left untouched; logging does not copy,
+rewrite, or delete old output when it starts writing to the new location.
+
+Every line is a version-1 JSON object with `schema_version`, `timestamp`,
+`level`, `message`, `event`, `component_type`, `component`, `hook_event`,
+`session_id`, `correlation_id`, `flow_name`, `pid`, and `details`. Contextual
+fields are null until known. `correlation_id` is the gateway invocation UUID;
+`pid` is only diagnostic. The `message` is a short explanation and `details`
+holds structured event-specific fields, including prompt text and supplied hook
+fields where existing events include them. The log writer uses a process lock
+and owner-only permissions on new Unix files and directories. Power loss or
+process termination during a write can leave a partial final line; there is no
+retention or automatic cleanup in this version.
+
+The common dispatcher promotes the validated session before project-context
+enrichment, so `project_context_ingested` and later records share the same
+top-level session. Startup, raw input, and rejected common input retain a null
+session. Observe-only mode does not validate common input, so its top-level
+session remains null; supplied session values may still appear in details.
+Promotion requires the dispatcher's invocation ID to match the active logging
+context, and gateway exit restores the previous context on every path.
 
 ## Gateway
 
@@ -38,6 +62,6 @@ Observe-only mode logs gateway entry/input plus the existing
  dispatch entry because no dispatcher runs. Intended dispatch destinations remain
 in `hook_observed` with `dispatcher_invoked: false`.
 
-Logs use the existing local file sink, never protocol stdout. Raw capture does
+Logs use the shared local file writer, never protocol stdout. Raw capture does
 not dump the full process environment or read a transcript. Deadline expiration
 can prevent subsequent logging; a missing finish record is not proof of success.

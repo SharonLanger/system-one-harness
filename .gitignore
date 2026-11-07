@@ -15,6 +15,7 @@ node_modules
 /backup/
 # Generated evidence; authored campaign cases and docs stay tracked
 /logs/
+.logs/
 /results/
 /experiments/**/results/
 /experiments/exports/

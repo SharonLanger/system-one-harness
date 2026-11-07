@@ -101,11 +101,13 @@ def _default_dispatch(payload, args, invocation_id, logger):
 
 def _default_log(level, event, **details):
     from log_utils import log
-    log(level, 'hook_gateway', event, raise_on_error=True, **details)
+    from soh_logging import current_component
+    component = current_component()
+    log(level, component.component.value if component else 'hook_gateway',
+        event, raise_on_error=True, **details)
 
-def main(argv=None, *, dispatcher=None, logger=None):
+def _main(argv=None, *, dispatcher=None, logger=None, invocation_id):
     started=monotonic()
-    invocation_id=str(uuid4())
     log_impl=logger or _default_log
     args=None
     result=Failure('not_started','gateway')
@@ -127,6 +129,9 @@ def main(argv=None, *, dispatcher=None, logger=None):
             return False
         if event=='common_input_validated':
             validated_session=details.get('session_id')
+            if isinstance(validated_session, str) and validated_session.strip():
+                from soh_logging import set_session
+                set_session(validated_session)
         metadata={'invocation_id':invocation_id,'hook_event_name':args.hook,
                   'session_id':validated_session,**details}
         try:
@@ -252,6 +257,24 @@ def main(argv=None, *, dispatcher=None, logger=None):
         if timer_started:
             signal.setitimer(signal.ITIMER_REAL,0)
             signal.signal(signal.SIGALRM,previous_handler)
+
+def main(argv=None, *, dispatcher=None, logger=None):
+    from soh_logging import HookEvent, invocation
+    invocation_id = str(uuid4())
+    selected = None
+    try:
+        raw = list(sys.argv[1:] if argv is None else argv)
+        for index, value in enumerate(raw):
+            if value == '--hook' and index + 1 < len(raw):
+                selected = raw[index + 1]
+            elif value.startswith('--hook='):
+                selected = value.split('=', 1)[1]
+        hook = HookEvent(selected) if selected in HookEvent._value2member_map_ else None
+    except Exception:
+        hook = None
+    with invocation(invocation_id, hook):
+        return _main(argv, dispatcher=dispatcher, logger=logger, invocation_id=invocation_id)
+
 
 if __name__=='__main__':
     raise SystemExit(main())

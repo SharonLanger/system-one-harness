@@ -16,14 +16,14 @@ from building_blocks.resolve_file import resolve_file
 from hooks.contracts import Context, Failure, Noop
 from hooks.session_state import inspect_and_save_event
 from flows.first_method_context_utils import SelectedMethod, EnrichmentDecision, build_enrichment_event, decide_enrichment
+from soh_logging import FlowName, flow_scope
 
-_FLOW_ID = 'first_method_context'
 _CAP = 8000
 
 
 def _log(logger, event, **details):
     try:
-        logger('INFO', event, flow_id=_FLOW_ID, **details)
+        logger('INFO', event, **details)
     except TimeoutError:
         raise
     except Exception:
@@ -161,6 +161,7 @@ def finalize_enrichment(request, logger, selected, *, session_store=None):
     return decision
 
 
+@flow_scope(FlowName.FIRST_METHOD_CONTEXT)
 def run(prompt, *, project_root, config, registry, logger, max_context_chars=_CAP,
         finalize_enrichment=None):
     """Return the existing hook outcome; never retry or reinterpret a block answer."""

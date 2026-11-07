@@ -1,3 +1,5 @@
+import json
+
 from log_utils import capture_records, log
 
 
@@ -13,4 +15,4 @@ def test_scoped_capture_avoids_file_and_resets(tmp_path, monkeypatch):
         ('test', 'captured', {'value': 42})]
     assert not destination.exists()
     log('INFO', 'test', 'default')
-    assert '"event": "default"' in destination.read_text()
+    assert json.loads(destination.read_text())['event'] == 'default'

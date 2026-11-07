@@ -4,6 +4,7 @@ from time import monotonic
 
 from hooks.contracts import Context, Noop, Failure, ValidationError, validate_result
 from hooks.dispatcher import HookEnvelope, require_string
+from soh_logging import ComponentName, ComponentType, component_scope
 
 @dataclass(frozen=True)
 class PromptRequest:
@@ -15,6 +16,7 @@ def _default_handler(request,logger):
     from flows.first_method_context import handle_prompt
     return handle_prompt(request,logger)
 
+@component_scope(ComponentType.DISPATCHER, ComponentName.USER_PROMPT_SUBMIT)
 def dispatch_user_prompt_submit(envelope,args,logger,*,handler=None,clock=monotonic):
     result=None
     logger('INFO','event_dispatcher_started',hook_event_name=envelope.hook_name,

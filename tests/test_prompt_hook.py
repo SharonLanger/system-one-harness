@@ -35,8 +35,7 @@ def hook_case(tmp_path, text='function greet() { return "😀"; }'):
     (shim / 'sitecustomize.py').write_text(bootstrap)
     env = {**os.environ, 'PYTHONPATH': os.pathsep.join([str(shim), str(ROOT / 'src')]),
            'HOOK_TEST_SPEC': str(spec), 'FIRST_FLOW_CALLS': str(calls), 'FIRST_FLOW_LOG': str(trace),
-           'FIRST_FLOW_STATE_ROOT': str(tmp_path / 'state'),
-           'FIRST_FLOW_HELPER': str(ROOT / 'build/typescript/session-state-cli.js')}
+           'FIRST_FLOW_STATE_ROOT': str(tmp_path / 'state')}
     args = ['--repository-root', str(repo), '--config', str(config), '--real']
     return {'repo': repo, 'path': path, 'event': event, 'data': data, 'env': env,
             'args': args, 'log': calls, 'spec': spec, 'code': text}

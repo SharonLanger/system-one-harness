@@ -144,12 +144,13 @@ def finalize_enrichment(request, logger, selected, *, session_store=None):
             raise ValueError('session_state_metadata_missing')
         transaction = (session_store.inspect_and_save_event if session_store is not None
                        else inspect_and_save_event)
-        decision = transaction(session_id, decide, deadline=deadline)
+        decision = transaction(session_id, decide, deadline=deadline,
+                               hook_name='UserPromptSubmit', flow_name=_FLOW_ID)
     except TimeoutError:
         raise
     except Exception as exc:
         _log(logger, 'session_state_enrichment_failed', error_type=type(exc).__name__,
-             message=str(exc), **details)
+             message='session_state_unavailable', **details)
         return EnrichmentDecision(True, 'state_unavailable')
     for index in decision.legacy_event_indices:
         _log(logger, 'legacy_metadata_ignored', record_index=index, **details)

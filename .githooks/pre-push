@@ -1,7 +1,5 @@
 #!/bin/sh
 set -eu
-while read local_ref local_sha remote_ref remote_sha; do
-  case "$local_sha" in 0000000000000000000000000000000000000000) continue ;; esac
-  # Check the outgoing tip. Historical violations predate this policy.
-  python3 scripts/check_repository_hygiene.py --tree "$local_sha"
-done
+# New branches exclude commits reachable from this remote's tracking refs.
+# Fetch the remote before pushing; missing/shallow history fails explicitly.
+exec python3 scripts/check_repository_hygiene.py --push "$1"

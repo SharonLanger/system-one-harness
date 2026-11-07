@@ -19,8 +19,23 @@ def main():
     from laya import registry, predict
     registry.real_loader = predict.real_loader = fake.load
     from hooks import session_state
-    session_state.save_event = functools.partial(session_state.save_event, logs_root=state)
-    session_state.inspect_and_save_event = functools.partial(session_state.inspect_and_save_event, logs_root=state)
+    session_state.save_event = functools.partial(session_state.save_event, database_path=state / "session-state.sqlite3")
+    session_state.inspect_and_save_event = functools.partial(session_state.inspect_and_save_event, database_path=state / "session-state.sqlite3")
+    # A controlled pipe checkpoint documents that state can commit before
+    # gateway emission. It exists only in this synthetic child launcher.
+    if os.environ.get('SOH_TEST_CHECKPOINT_FD'):
+        transaction = session_state.inspect_and_save_event
+        def checkpoint(*a, **kw):
+            decision = transaction(*a, **kw)
+            os.write(int(os.environ['SOH_TEST_CHECKPOINT_FD']), b'C')
+            os.read(int(os.environ['SOH_TEST_RELEASE_FD']), 1)
+            return decision
+        session_state.inspect_and_save_event = checkpoint
+    if '--hook' in args and args[args.index('--hook') + 1] == 'PostCompact':
+        from building_blocks import typescript
+        def forbidden(*a, **kw):
+            raise AssertionError('PostCompact source tripwire')
+        typescript.outline = typescript.extract_callable = forbidden
     import log_utils
     records = []
     # Only file persistence crosses a real storage boundary. Diagnostics stay in memory.

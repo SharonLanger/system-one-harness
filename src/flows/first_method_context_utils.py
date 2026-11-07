@@ -31,7 +31,7 @@ class EnrichmentDecision:
 
 def build_enrichment_event(selected):
     return {'source': {'kind': 'flow', 'name': 'first_method_context'},
-            'type': 'context_enriched', 'payload': {'files': [{
+            'hook_name': 'UserPromptSubmit', 'type': 'context_enriched', 'payload': {'files': [{
                 'filePath': selected.file_path, 'methodNames': [selected.name],
                 'methods': [{'name': selected.name, 'signature': selected.signature,
                              'startLine': selected.start_line, 'endLine': selected.end_line}]}]}}

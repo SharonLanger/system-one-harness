@@ -17,7 +17,7 @@ tests remain active while their coverage is moved into these suites; they are
 included in the full run.
 
 `support/` contains a scripted Laya fake, an in-memory session store, and a
-recording logger. Production still uses the file session store and JSONL logger.
+recording logger. Production uses the Python SQLite session store and JSONL diagnostic logger.
 Use temporary directories for tests of actual file persistence or process
 boundaries. Do not use experiment modules or generated reports as test inputs.
 
@@ -43,7 +43,7 @@ section). Choose **Offline tests** and a named job:
   the suite organization evolves.
 - **TypeScript / build and tests**: compiles the helper and runs all Node tests.
 
-The separate **Repository hygiene** workflow checks tracked-file conventions.
+The separate **Repository hygiene** workflow checks the candidate tree and introduced PR/push history for prohibited paths and SQLite headers. It reads Git blobs, including deleted-in-range files. Only XML test reports are uploaded; state directories and database fixtures must never be artifacts.
 Each test job has a summary with collected, passed, failed/error and skipped
 counts. Expand the test step for failure details. On the workflow run page,
 **Artifacts** contains downloadable JUnit XML reports for seven days. Reports
@@ -71,14 +71,16 @@ are needed by these tests.
 | Malformed public JSON never invokes the model | Real-entrypoint malformed-input test |
 
 `support/cli_runner.py` is a test-only bootstrap. It replaces the external Laya
-loader, captures log records in memory, and redirects the real file store to a
+loader, captures log records in memory, and redirects the real SQLite store to a
 per-test temporary directory before loading the real entry point. It leaves the
 flow, blocks, dispatchers, serializer, TypeScript extraction and transaction
 implementation active. Child diagnostics use stderr; tests do not read generated
 log files as their result oracle. Temporary input fixtures are still read normally.
 
 These tests do not establish model quality or full operating-system network/write
-isolation. Those remain separate work. Existing persistence tests remain active.
+isolation. Those remain separate work. Existing persistence scenarios are exercised with SQLite; obsolete Node/JSONL transport assertions have been replaced.
+
+`unit/hooks/test_session_store_validation.py` covers metadata, JSON, exact UTF-8 limits, initialization and filtering; `test_session_transaction.py` uses real SQLite locks and coordinated spawned processes for decision races, rollback, process termination and deadlines. `unit/test_repository_hygiene.py` creates only synthetic disposable Git repositories and databases. `system/hooks/test_sqlite_process_lifecycle.py` checks fresh CLI/gateway processes, failure recovery and the existing commit-before-emission limitation. The `SQLite / …` CI matrix supplies focused Python 3.11/Linux and macOS permissions, locks and process checks; local Linux results do not establish macOS validation.
 
 ## Next project: experiment migration
 

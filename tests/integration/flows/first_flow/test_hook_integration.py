@@ -28,11 +28,10 @@ import log_utils
 spec = json.loads(os.environ['FIRST_FLOW_SPEC'])
 from hooks import session_state
 session_state.ROOT = __import__('pathlib').Path(os.environ['FIRST_FLOW_STATE_ROOT'])
-# Keep the compiled helper at the runtime root while isolating all persisted state.
+# Isolate SQLite state independently of the source extraction helper.
 original_inspect = session_state.inspect_and_save_event
 def isolated_inspect(*args, **kwargs):
-    kwargs['logs_root'] = session_state.ROOT
-    kwargs['helper'] = os.environ['FIRST_FLOW_HELPER']
+    kwargs['database_path'] = session_state.ROOT / 'session-state.sqlite3'
     return original_inspect(*args, **kwargs)
 from flows import first_method_context
 first_method_context.inspect_and_save_event = isolated_inspect
@@ -85,8 +84,7 @@ def gateway(h, tmp_path, *, prompt=PROMPT, spec=None, extra=(), event_change=Non
     calls = tmp_path / 'calls.jsonl'
     env = {**os.environ, 'PYTHONPATH': str(ROOT / 'src'),
            'FIRST_FLOW_SPEC': json.dumps(fixed), 'FIRST_FLOW_LOG': str(log),
-           'FIRST_FLOW_CALLS': str(calls), 'FIRST_FLOW_STATE_ROOT': str(tmp_path / 'state'),
-           'FIRST_FLOW_HELPER': str(ROOT / 'build/typescript/session-state-cli.js')}
+           'FIRST_FLOW_CALLS': str(calls), 'FIRST_FLOW_STATE_ROOT': str(tmp_path / 'state')}
     command = [sys.executable, '-c', BOOTSTRAP, '--hook', 'UserPromptSubmit',
                '--repository-root', str(h.root), '--deadline', '30', *(['--real'] if real else []), *extra]
     result = subprocess.run(command, input=json.dumps(event).encode(), capture_output=True,
@@ -275,10 +273,11 @@ def test_H08_existing_handler_injection_and_actual_default_registration(h, golde
 def test_session_duplicate_gateway_returns_zero_bytes_without_state_change(h, tmp_path, golden):
     first, _, _ = gateway(h, tmp_path)
     assert json.loads(first.stdout)['hookSpecificOutput']['additionalContext'] == golden
-    path = tmp_path / 'state/session-state/subprocess-session.jsonl'
+    path = tmp_path / 'state/session-state.sqlite3'
     before = path.read_bytes()
     second, records, _ = gateway(h, tmp_path)
     assert second.returncode == 0 and second.stdout == b''
     assert path.read_bytes() == before
-    assert len(before.splitlines()) == 1
+    with __import__('sqlite3').connect(path) as db:
+        assert db.execute('SELECT count(*) FROM session_events').fetchone()[0] == 1
     assert any(r['event'] == 'enrichment_skipped' for r in records)

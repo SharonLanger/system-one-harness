@@ -1,0 +1,1 @@
+{"schema_version":1,"timestamp":"2026-11-06T23:00:00.000Z","level":"INFO","message":"Gateway finished.","event":"gateway_finished","component_type":"gateway","component":"hook_gateway","hook_event":"UserPromptSubmit","session_id":"session-A","correlation_id":"inv-A","flow_name":null,"pid":4200,"details":{}}

@@ -1,0 +1,24 @@
+{
+  "records": [
+    {
+      "id": "space",
+      "file": "2026-11-09/09-00.jsonl",
+      "line": 1
+    },
+    {
+      "id": "empty",
+      "file": "2026-11-09/09-00.jsonl",
+      "line": 2
+    },
+    {
+      "id": "null",
+      "file": "2026-11-09/09-00.jsonl",
+      "line": 3
+    },
+    {
+      "id": "literal",
+      "file": "2026-11-09/09-00.jsonl",
+      "line": 4
+    }
+  ]
+}

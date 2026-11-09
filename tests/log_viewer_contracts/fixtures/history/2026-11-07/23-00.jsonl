@@ -1,0 +1,1 @@
+{"schema_version":1,"timestamp":"2026-11-07T23:59:59.000Z","level":"INFO","message":"Session state saved.","event":"session_state_saved","component_type":"dispatcher","component":"hook_dispatcher","hook_event":"PostCompact","session_id":"session-C","correlation_id":"inv-E","flow_name":null,"pid":4200,"details":{}}

@@ -57,10 +57,13 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -e '.[test]'
+python -m playwright install chromium
 npm ci --prefix typescript-helper
 npm run build --prefix typescript-helper
 python -m cli doctor
 ```
+
+Chromium is used by the viewer's browser tests. On a minimal Linux system, use `python -m playwright install --with-deps chromium` to install its system dependencies too. The installed viewer uses your normal browser and does not require Playwright or Node.
 
 `doctor` checks the local Python, gateway timer, and log path. It does **not** check the model, Node build, or Claude plugin. The TypeScript build creates the helper under `build/typescript/`; rebuild it after editing `typescript-helper/src/`.
 
@@ -113,3 +116,21 @@ For manual registration, see [hook usage](docs/hook-usage.md). [Configuration co
 SOH is an experimental research prototype made for fun, not a stable published package or hosted service. Real inference currently requires local setup. Tests exercise the harness with controlled responses; they do not establish the model's answer quality. Some historical experiment checks remain deferred.
 
 For bugs and changes, read [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability privately, read [SECURITY.md](SECURITY.md). Project-owned source is offered under [Apache License 2.0](LICENSE); separately obtained runtimes and model weights have their own terms.
+
+## Local log viewer
+
+Run `system-one-harness logs --ui` to open a local browser search over the existing hourly JSONL log root. Use `--no-open` to print the authorized local URL without opening a browser. Leave the command running while using the viewer; Ctrl-C stops it. If the browser does not open, use the printed URL.
+
+The viewer uses an absolute `SOH_LOG_ROOT` override, the checkout's `.logs`, or the installed user-state log location. Viewing never creates or modifies a log root. Existing `logs --last N` is unchanged; `--ui` cannot be combined with explicitly supplied `--last`, and `--no-open` requires `--ui`.
+
+The page starts with filters only (Past hour / All levels). Prepare exact session, correlation, flow, component/type, levels, event, hook, UTC range and literal text filters, then press **Run search**. Draft changes do not execute or change submitted results. All-history session/invocation shortcuts prepare a new draft; Run applies it. Load more continues the submitted snapshot; Refresh captures new records. Display order is file/append order, not strict timestamp order. Diagnostics explain unreadable/corrupt/deferred data and incomplete coverage.
+
+Categorical values match exactly; enter multiple values on separate lines to match any of them. Different filters combine with AND. Use **Include null** for missing context; the text `null` is a different value. Dates use UTC with an inclusive start and exclusive end. Text search is a case-insensitive literal substring; searching JSON details is opt-in. Selecting a row shows its full message and original JSON.
+
+The viewer reads existing files across hours and days, including gaps, and pauses at a full page. It retains at most five pages/1,000 summaries; evicted history requires a new search. An interrupted advance offers **Retry current page** against the same snapshot. Queries expire after 15 idle minutes. Lines larger than 4 MiB are skipped with diagnostics. Broad searches still scan files, so their speed depends on log volume; startup performs no scan. Real-log performance and macOS viewer behavior have not yet been validated; automated browser coverage uses Linux/Chromium and synthetic logs.
+
+The viewer is loopback-only, token protected, packaged with the Python install, and uses no hosted service, database or Docker. Keep the printed launch URL local. See the [API and query semantics](docs/log-viewer/API.md) and [scenario contracts and test commands](tests/log_viewer_contracts/README.md).
+
+### Change log
+
+- 2026-11-09: Added `logs --ui` for local filtering and JSON inspection across hourly files, with explicit Run, snapshot pagination, cancellation, refresh and interrupted-page recovery. Scenario contracts LV01–LV16 cover these behaviors. Future behavior changes should update the affected cases and record their reason here; CI reports validation for each commit.

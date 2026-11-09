@@ -1,0 +1,1 @@
+{"schema_version":1,"timestamp":"2026-11-09T10:00:00.000Z","level":"INFO","message":"Prepared input.","event":"prepared","component_type":"block","component":"block_runtime","hook_event":null,"session_id":"null","correlation_id":null,"flow_name":null,"pid":4200,"details":{}}

@@ -14,7 +14,7 @@ system-one-harness = "cli:main"
 laya-context-router = "cli:main"
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10"]
+test = ["pytest>=8,<10", "playwright>=1.50,<2", "setuptools>=68", "wheel"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "tests"]
@@ -27,11 +27,11 @@ py-modules = ["blocks", "context_format", "json_utils", "live_check", "log_utils
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["answers*", "block_runtime*", "building_blocks*", "cli*", "defaults*", "flows*", "hooks*", "laya*", "questions*", "soh_logging*"]
+include = ["answers*", "block_runtime*", "building_blocks*", "cli*", "defaults*", "flows*", "hooks*", "laya*", "questions*", "soh_logging*", "log_viewer*"]
 namespaces = false
 
 [tool.setuptools.package-data]
 building_blocks = ["questions/*/*.json", "questions/*/*.md", "questions/*/block.py"]
 block_runtime = ["*.md"]
 defaults = ["*.md", "rules/*.json", "questions/*.json"]
-
+log_viewer = ["static/*.html", "static/*.js", "static/*.css"]

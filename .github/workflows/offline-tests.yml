@@ -39,6 +39,9 @@ jobs:
           cache-dependency-path: typescript-helper/package-lock.json
       - run: python -m pip install --upgrade pip setuptools wheel
       - run: python -m pip install -e '.[test]'
+      - name: Install browser for viewer contract suite
+        if: matrix.suite == 'existing-suite'
+        run: python -m playwright install --with-deps chromium
       - run: npm ci --prefix typescript-helper
       - run: npm run build --prefix typescript-helper
       - name: Run ${{ matrix.suite }} tests

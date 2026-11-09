@@ -1,0 +1,3039 @@
+{
+  "catalog_version": 1,
+  "status": "review specification; production runner not implemented",
+  "default_clock": "2026-11-09T10:00:00.000Z",
+  "fixture": "history",
+  "fixture_order": [
+    "r15",
+    "r14",
+    "r13",
+    "r12",
+    "r16",
+    "r11",
+    "r10",
+    "r09",
+    "r08",
+    "r07",
+    "r06",
+    "r05",
+    "r04",
+    "r03",
+    "r02",
+    "r01"
+  ],
+  "canonical_all_history_defaults": {
+    "query_version": 1,
+    "start": null,
+    "end": null,
+    "selectors": {},
+    "text": null,
+    "page_size": 200,
+    "order": "file_append_desc"
+  },
+  "fixtures_manifest": "fixtures/history/manifest.json",
+  "cases": [
+    {
+      "id": "Q001",
+      "purpose": "all categorical/text restrictions absent",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        }
+      },
+      "expected_ids": [
+        "r15",
+        "r14",
+        "r13",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r08",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q002",
+      "purpose": "entire request absent optional fields defaults to past hour",
+      "fixture": "history",
+      "request": {},
+      "expected_ids": [
+        "r12",
+        "r16",
+        "r11",
+        "r10"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-09T09:00:00.000000Z",
+        "end": "2026-11-09T10:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q003",
+      "purpose": "relative 24 hours crosses missing day",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "relative",
+          "seconds": 86400
+        }
+      },
+      "expected_ids": [
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-08T10:00:00.000000Z",
+        "end": "2026-11-09T10:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q004",
+      "purpose": "absolute inclusive start exclusive end",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-09T09:00:00Z",
+          "end": "2026-11-09T10:00:00Z"
+        }
+      },
+      "expected_ids": [
+        "r12",
+        "r16",
+        "r11",
+        "r10"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-09T09:00:00.000000Z",
+        "end": "2026-11-09T10:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q005",
+      "purpose": "start only includes endpoint and future records",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-09T10:00:00Z"
+        }
+      },
+      "expected_ids": [
+        "r15",
+        "r14",
+        "r13"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-09T10:00:00.000000Z",
+        "end": null,
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q006",
+      "purpose": "end only excludes exact endpoint",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "end": "2026-11-07T00:00:00Z"
+        }
+      },
+      "expected_ids": [
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": "2026-11-07T00:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q007",
+      "purpose": "offset normalization to UTC",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-09T11:00:00+02:00",
+          "end": "2026-11-09T12:00:00+02:00"
+        }
+      },
+      "expected_ids": [
+        "r12",
+        "r16",
+        "r11",
+        "r10"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-09T09:00:00.000000Z",
+        "end": "2026-11-09T10:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q008",
+      "purpose": "range wholly inside absent hour",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-07T01:00:00Z",
+          "end": "2026-11-07T02:00:00Z"
+        }
+      },
+      "expected_ids": [],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-07T01:00:00.000000Z",
+        "end": "2026-11-07T02:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q009",
+      "purpose": "range includes files before and after absent hour",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-07T00:00:00Z",
+          "end": "2026-11-07T03:00:00Z"
+        }
+      },
+      "expected_ids": [
+        "r07",
+        "r06",
+        "r05",
+        "r04"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-07T00:00:00.000000Z",
+        "end": "2026-11-07T03:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q010",
+      "purpose": "range wholly inside missing day",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-08T00:00:00Z",
+          "end": "2026-11-09T00:00:00Z"
+        }
+      },
+      "expected_ids": [],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-08T00:00:00.000000Z",
+        "end": "2026-11-09T00:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q011",
+      "purpose": "session spans missing hours and missing day",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r11",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r03",
+        "r02"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q012",
+      "purpose": "session_id alone defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r11",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r03",
+        "r02"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q013",
+      "purpose": "correlation_id alone defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "correlation_id": {
+            "values": [
+              "inv-G"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r11",
+        "r10"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "correlation_id": {
+            "values": [
+              "inv-G"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q014",
+      "purpose": "flow_name alone defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "flow_name": {
+            "values": [
+              "first_method_context"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r11",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r02"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "flow_name": {
+            "values": [
+              "first_method_context"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q015",
+      "purpose": "component alone defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "component": {
+            "values": [
+              "block_runtime"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r13",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r02"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "component": {
+            "values": [
+              "block_runtime"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q016",
+      "purpose": "component_type alone defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "component_type": {
+            "values": [
+              "block"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r13",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r02"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "component_type": {
+            "values": [
+              "block"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q017",
+      "purpose": "level alone defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "level": {
+            "values": [
+              "ERROR"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r10",
+        "r06",
+        "r04"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "level": {
+            "values": [
+              "ERROR"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q018",
+      "purpose": "event alone defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "event": {
+            "values": [
+              "failed"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r14",
+        "r16",
+        "r10",
+        "r06",
+        "r04"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "event": {
+            "values": [
+              "failed"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q019",
+      "purpose": "hook_event alone defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "hook_event": {
+            "values": [
+              "UserPromptSubmit"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r15",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "hook_event": {
+            "values": [
+              "UserPromptSubmit"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q020",
+      "purpose": "OR multiple values within level",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "level": {
+            "values": [
+              "ERROR",
+              "WARNING"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r11",
+        "r10",
+        "r06",
+        "r05",
+        "r04"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "level": {
+            "values": [
+              "ERROR",
+              "WARNING"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q021",
+      "purpose": "null session is not string null",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "include_null": true
+          }
+        }
+      },
+      "expected_ids": [
+        "r14",
+        "r12",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [],
+            "include_null": true
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q022",
+      "purpose": "literal string null",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "null"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r13"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [
+              "null"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q023",
+      "purpose": "OR session A and null",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": true
+          }
+        }
+      },
+      "expected_ids": [
+        "r14",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": true
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q024",
+      "purpose": "case sensitive IDs",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "SESSION-A"
+            ]
+          }
+        }
+      },
+      "expected_ids": [],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [
+              "SESSION-A"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q025",
+      "purpose": "case insensitive literal message search",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "text": {
+          "value": "sElEcTiOn"
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r10",
+        "r06",
+        "r04"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": {
+          "value": "sElEcTiOn",
+          "scope": "message"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q026",
+      "purpose": "details excluded by default",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "text": {
+          "value": "needle-in-details"
+        }
+      },
+      "expected_ids": [],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": {
+          "value": "needle-in-details",
+          "scope": "message"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q027",
+      "purpose": "details search opt in",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "text": {
+          "value": "needle-in-details",
+          "scope": "message_and_details"
+        }
+      },
+      "expected_ids": [
+        "r05"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": {
+          "value": "needle-in-details",
+          "scope": "message_and_details"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q028",
+      "purpose": "Unicode casefold",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "text": {
+          "value": "STRASSE"
+        }
+      },
+      "expected_ids": [
+        "r15"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": {
+          "value": "STRASSE",
+          "scope": "message"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q029",
+      "purpose": "regex-looking text is literal",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "text": {
+          "value": "[a.*]"
+        }
+      },
+      "expected_ids": [
+        "r15"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": {
+          "value": "[a.*]",
+          "scope": "message"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q030",
+      "purpose": "details do not promote session",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ]
+          },
+          "correlation_id": {
+            "values": [
+              "inv-H"
+            ]
+          }
+        }
+      },
+      "expected_ids": [],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": false
+          },
+          "correlation_id": {
+            "values": [
+              "inv-H"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q031",
+      "purpose": "correlation includes unvalidated context",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "correlation_id": {
+            "values": [
+              "inv-A"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "correlation_id": {
+            "values": [
+              "inv-A"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q032",
+      "purpose": "unknown vocabulary valid and searchable",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "level": {
+            "values": [
+              "NOTICE"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r15"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "level": {
+            "values": [
+              "NOTICE"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q033",
+      "purpose": "known valid no-match selector",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "event": {
+            "values": [
+              "never_seen"
+            ]
+          }
+        }
+      },
+      "expected_ids": [],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "event": {
+            "values": [
+              "never_seen"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q034",
+      "purpose": "every filter dimension defined",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ]
+          },
+          "correlation_id": {
+            "values": [
+              "inv-G"
+            ]
+          },
+          "flow_name": {
+            "values": [
+              "first_method_context"
+            ]
+          },
+          "component": {
+            "values": [
+              "block_runtime"
+            ]
+          },
+          "component_type": {
+            "values": [
+              "block"
+            ]
+          },
+          "level": {
+            "values": [
+              "ERROR"
+            ]
+          },
+          "event": {
+            "values": [
+              "failed"
+            ]
+          },
+          "hook_event": {
+            "values": [
+              "UserPromptSubmit"
+            ]
+          }
+        },
+        "text": {
+          "value": "selection",
+          "scope": "message"
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "query_version": 1
+      },
+      "expected_ids": [
+        "r10"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-09T09:00:00.000000Z",
+        "end": "2026-11-09T10:00:00.000000Z",
+        "selectors": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": false
+          },
+          "correlation_id": {
+            "values": [
+              "inv-G"
+            ],
+            "include_null": false
+          },
+          "flow_name": {
+            "values": [
+              "first_method_context"
+            ],
+            "include_null": false
+          },
+          "component": {
+            "values": [
+              "block_runtime"
+            ],
+            "include_null": false
+          },
+          "component_type": {
+            "values": [
+              "block"
+            ],
+            "include_null": false
+          },
+          "level": {
+            "values": [
+              "ERROR"
+            ],
+            "include_null": false
+          },
+          "event": {
+            "values": [
+              "failed"
+            ],
+            "include_null": false
+          },
+          "hook_event": {
+            "values": [
+              "UserPromptSubmit"
+            ],
+            "include_null": false
+          }
+        },
+        "text": {
+          "value": "selection",
+          "scope": "message"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q035",
+      "purpose": "page size one yields same complete ordering",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "page_size": 1
+      },
+      "expected_ids": [
+        "r15",
+        "r14",
+        "r13",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r08",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "assertions": [
+        "drain_all_pages",
+        "no_duplicates",
+        "progress_monotonic"
+      ],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": null,
+        "page_size": 1,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q036",
+      "purpose": "same timestamp retains append-order distinction",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-07T02:00:00Z",
+          "end": "2026-11-07T02:00:01Z"
+        }
+      },
+      "expected_ids": [
+        "r07",
+        "r06"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-07T02:00:00.000000Z",
+        "end": "2026-11-07T02:00:01.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q037",
+      "purpose": "no category and empty text all history",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": null,
+        "text": {
+          "value": ""
+        }
+      },
+      "expected_ids": [
+        "r15",
+        "r14",
+        "r13",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r08",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q038",
+      "purpose": "duplicate selector values normalized",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-B",
+              "session-A",
+              "session-A"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [
+              "session-A",
+              "session-B"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q039",
+      "purpose": "query after no-match returns valid rows",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16",
+        "r11",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r03",
+        "r02"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "prior_request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "missing"
+            ]
+          }
+        }
+      },
+      "prior_expected_ids": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q040",
+      "purpose": "component type independent from flow name",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "filters": {
+          "component_type": {
+            "values": [
+              "flow"
+            ]
+          },
+          "flow_name": {
+            "values": [
+              "first_method_context"
+            ]
+          }
+        }
+      },
+      "expected_ids": [
+        "r16"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {
+          "component_type": {
+            "values": [
+              "flow"
+            ],
+            "include_null": false
+          },
+          "flow_name": {
+            "values": [
+              "first_method_context"
+            ],
+            "include_null": false
+          }
+        },
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q041",
+      "purpose": "single hour can span two UTC partitions",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        }
+      },
+      "expected_ids": [
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "clock": "2026-11-06T23:30:00.000Z",
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-06T22:30:00.000000Z",
+        "end": "2026-11-06T23:30:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q042",
+      "purpose": "null time defaults to past hour",
+      "fixture": "history",
+      "request": {
+        "time": null
+      },
+      "expected_ids": [
+        "r12",
+        "r16",
+        "r11",
+        "r10"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": "2026-11-09T09:00:00.000000Z",
+        "end": "2026-11-09T10:00:00.000000Z",
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q043",
+      "purpose": "text absent and null scope-independent unrestricted",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "text": null
+      },
+      "expected_ids": [
+        "r15",
+        "r14",
+        "r13",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r08",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q044",
+      "purpose": "whitespace text is literal not trim-to-empty",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "text": {
+          "value": "   "
+        }
+      },
+      "expected_ids": [],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": {
+          "value": "   ",
+          "scope": "message"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q045",
+      "purpose": "newline in details is JSON-escaped searchable",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        },
+        "text": {
+          "value": "hello\\n世界",
+          "scope": "message_and_details"
+        }
+      },
+      "expected_ids": [
+        "r02"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": {
+          "value": "hello\\n世界",
+          "scope": "message_and_details"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    },
+    {
+      "id": "Q046",
+      "purpose": "all missing filters no error after previous filtered query",
+      "fixture": "history",
+      "request": {
+        "time": {
+          "mode": "all"
+        }
+      },
+      "expected_ids": [
+        "r15",
+        "r14",
+        "r13",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r08",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "expected_state": "complete",
+      "expected_diagnostics": [],
+      "prior_request": {
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ]
+          },
+          "correlation_id": {
+            "values": [
+              "inv-G"
+            ]
+          },
+          "flow_name": {
+            "values": [
+              "first_method_context"
+            ]
+          },
+          "component": {
+            "values": [
+              "block_runtime"
+            ]
+          },
+          "component_type": {
+            "values": [
+              "block"
+            ]
+          },
+          "level": {
+            "values": [
+              "ERROR"
+            ]
+          },
+          "event": {
+            "values": [
+              "failed"
+            ]
+          },
+          "hook_event": {
+            "values": [
+              "UserPromptSubmit"
+            ]
+          }
+        },
+        "text": {
+          "value": "selection",
+          "scope": "message"
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "query_version": 1
+      },
+      "prior_expected_ids": [
+        "r10"
+      ],
+      "expected_canonical": {
+        "query_version": 1,
+        "start": null,
+        "end": null,
+        "selectors": {},
+        "text": null,
+        "page_size": 200,
+        "order": "file_append_desc"
+      }
+    }
+  ],
+  "invalid_cases": [
+    {
+      "id": "V001",
+      "purpose": "unknown field",
+      "request": {
+        "filters": {
+          "sesion_id": {
+            "values": [
+              "x"
+            ]
+          }
+        }
+      },
+      "expected_error": {
+        "code": "unknown_field",
+        "path": "filters.sesion_id"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V002",
+      "purpose": "selector wrong type",
+      "request": {
+        "filters": {
+          "session_id": "x"
+        }
+      },
+      "expected_error": {
+        "code": "invalid_type",
+        "path": "filters.session_id"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V003",
+      "purpose": "null in values is not explicit null selection",
+      "request": {
+        "filters": {
+          "session_id": {
+            "values": [
+              null
+            ]
+          }
+        }
+      },
+      "expected_error": {
+        "code": "invalid_type",
+        "path": "filters.session_id.values[0]"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V004",
+      "purpose": "blank categorical value",
+      "request": {
+        "filters": {
+          "session_id": {
+            "values": [
+              " "
+            ]
+          }
+        }
+      },
+      "expected_error": {
+        "code": "blank_value",
+        "path": "filters.session_id.values[0]"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V005",
+      "purpose": "mixed bound modes",
+      "request": {
+        "time": {
+          "mode": "all",
+          "start": "2026-11-09T00:00:00Z"
+        }
+      },
+      "expected_error": {
+        "code": "unexpected_field",
+        "path": "time.start"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V006",
+      "purpose": "empty absolute interval",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-09T00:00:00Z",
+          "end": "2026-11-09T00:00:00Z"
+        }
+      },
+      "expected_error": {
+        "code": "invalid_range",
+        "path": "time"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V007",
+      "purpose": "reverse interval",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-10T00:00:00Z",
+          "end": "2026-11-09T00:00:00Z"
+        }
+      },
+      "expected_error": {
+        "code": "invalid_range",
+        "path": "time"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V008",
+      "purpose": "absolute without bounds",
+      "request": {
+        "time": {
+          "mode": "absolute"
+        }
+      },
+      "expected_error": {
+        "code": "missing_bound",
+        "path": "time"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V009",
+      "purpose": "naive timestamp",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-09T00:00:00"
+        }
+      },
+      "expected_error": {
+        "code": "timezone_required",
+        "path": "time.start"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V010",
+      "purpose": "invalid timestamp",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-02-30T00:00:00Z"
+        }
+      },
+      "expected_error": {
+        "code": "invalid_timestamp",
+        "path": "time.start"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V011",
+      "purpose": "boolean relative interval",
+      "request": {
+        "time": {
+          "mode": "relative",
+          "seconds": true
+        }
+      },
+      "expected_error": {
+        "code": "invalid_type",
+        "path": "time.seconds"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V012",
+      "purpose": "zero relative interval",
+      "request": {
+        "time": {
+          "mode": "relative",
+          "seconds": 0
+        }
+      },
+      "expected_error": {
+        "code": "out_of_range",
+        "path": "time.seconds"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V013",
+      "purpose": "unsupported time mode",
+      "request": {
+        "time": {
+          "mode": "yesterday"
+        }
+      },
+      "expected_error": {
+        "code": "unsupported_value",
+        "path": "time.mode"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V014",
+      "purpose": "invalid text scope",
+      "request": {
+        "text": {
+          "value": "",
+          "scope": "regex"
+        }
+      },
+      "expected_error": {
+        "code": "unsupported_value",
+        "path": "text.scope"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V015",
+      "purpose": "text value wrong type",
+      "request": {
+        "text": {
+          "value": 3
+        }
+      },
+      "expected_error": {
+        "code": "invalid_type",
+        "path": "text.value"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V016",
+      "purpose": "boolean page size",
+      "request": {
+        "page_size": true
+      },
+      "expected_error": {
+        "code": "invalid_type",
+        "path": "page_size"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V017",
+      "purpose": "oversized page",
+      "request": {
+        "page_size": 201
+      },
+      "expected_error": {
+        "code": "out_of_range",
+        "path": "page_size"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V018",
+      "purpose": "null page size",
+      "request": {
+        "page_size": null
+      },
+      "expected_error": {
+        "code": "invalid_type",
+        "path": "page_size"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V019",
+      "purpose": "unsupported ordering",
+      "request": {
+        "order": "timestamp_desc"
+      },
+      "expected_error": {
+        "code": "unsupported_value",
+        "path": "order"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V020",
+      "purpose": "query version unknown",
+      "request": {
+        "query_version": 2
+      },
+      "expected_error": {
+        "code": "unsupported_version",
+        "path": "query_version"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V021",
+      "purpose": "unknown top-level operator",
+      "request": {
+        "where": "1=1"
+      },
+      "expected_error": {
+        "code": "unknown_field",
+        "path": "where"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V022",
+      "purpose": "zero-match does not bypass validation",
+      "request": {
+        "filters": {
+          "session_id": {
+            "values": [
+              "never_seen"
+            ]
+          },
+          "level": {
+            "values": [
+              7
+            ]
+          }
+        }
+      },
+      "expected_error": {
+        "code": "invalid_type",
+        "path": "filters.level.values[0]"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V023",
+      "purpose": "null disallowed for required record field",
+      "request": {
+        "filters": {
+          "level": {
+            "include_null": true
+          }
+        }
+      },
+      "expected_error": {
+        "code": "null_not_supported",
+        "path": "filters.level.include_null"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V024",
+      "purpose": "include_null must be boolean",
+      "request": {
+        "filters": {
+          "session_id": {
+            "include_null": "true"
+          }
+        }
+      },
+      "expected_error": {
+        "code": "invalid_type",
+        "path": "filters.session_id.include_null"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V025",
+      "purpose": "selector extra operator",
+      "request": {
+        "filters": {
+          "session_id": {
+            "not": "x"
+          }
+        }
+      },
+      "expected_error": {
+        "code": "unknown_field",
+        "path": "filters.session_id.not"
+      },
+      "expected_reader_calls": 0
+    },
+    {
+      "id": "V026",
+      "purpose": "date-only value",
+      "request": {
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-09"
+        }
+      },
+      "expected_error": {
+        "code": "timezone_required",
+        "path": "time.start"
+      },
+      "expected_reader_calls": 0
+    }
+  ],
+  "matrix": {
+    "id_prefix": "M-PRESENCE",
+    "dimensions": [
+      "time",
+      "session_id",
+      "correlation_id",
+      "flow_name",
+      "component",
+      "component_type",
+      "level",
+      "event",
+      "hook_event",
+      "text"
+    ],
+    "active_values": {
+      "session_id": "session-A",
+      "correlation_id": "inv-G",
+      "flow_name": "first_method_context",
+      "component": "block_runtime",
+      "component_type": "block",
+      "level": "ERROR",
+      "event": "failed",
+      "hook_event": "UserPromptSubmit"
+    },
+    "active_time": {
+      "mode": "relative",
+      "seconds": 3600
+    },
+    "active_text": {
+      "value": "selection",
+      "scope": "message"
+    },
+    "inactive_time": {
+      "mode": "all"
+    },
+    "truth_memberships": {
+      "time": [
+        "r12",
+        "r16",
+        "r11",
+        "r10"
+      ],
+      "session_id": [
+        "r16",
+        "r11",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r03",
+        "r02"
+      ],
+      "correlation_id": [
+        "r16",
+        "r11",
+        "r10"
+      ],
+      "flow_name": [
+        "r16",
+        "r11",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r02"
+      ],
+      "component": [
+        "r13",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r02"
+      ],
+      "component_type": [
+        "r13",
+        "r10",
+        "r07",
+        "r06",
+        "r04",
+        "r02"
+      ],
+      "level": [
+        "r16",
+        "r10",
+        "r06",
+        "r04"
+      ],
+      "event": [
+        "r14",
+        "r16",
+        "r10",
+        "r06",
+        "r04"
+      ],
+      "hook_event": [
+        "r15",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ],
+      "text": [
+        "r16",
+        "r10",
+        "r06",
+        "r04"
+      ]
+    },
+    "expected_case_count": 1024,
+    "algorithm": "For each bitmask 0..1023, enable the selected dimensions. Intersect the explicitly authored truth_memberships for enabled dimensions; retain fixture_order. No production matcher is used to compute expectations. The time bit off is unrestricted time, not omitted request time; omitted-time defaults are Q002/Q042."
+  },
+  "families": [
+    {
+      "id_prefix": "M-UNSET",
+      "fields": [
+        "session_id",
+        "correlation_id",
+        "flow_name",
+        "component",
+        "component_type",
+        "level",
+        "event",
+        "hook_event"
+      ],
+      "variants": [
+        "omitted",
+        "null",
+        "empty_object",
+        "empty_values"
+      ],
+      "count": 32,
+      "base_request": {
+        "time": {
+          "mode": "all"
+        }
+      },
+      "expected_ids": [
+        "r15",
+        "r14",
+        "r13",
+        "r12",
+        "r16",
+        "r11",
+        "r10",
+        "r09",
+        "r08",
+        "r07",
+        "r06",
+        "r05",
+        "r04",
+        "r03",
+        "r02",
+        "r01"
+      ]
+    },
+    {
+      "id_prefix": "M-NULL",
+      "fields": [
+        "session_id",
+        "correlation_id",
+        "flow_name",
+        "component",
+        "component_type",
+        "hook_event"
+      ],
+      "variants": [
+        "null_only",
+        "value_or_null",
+        "null_only_plus_unrelated_no_match"
+      ],
+      "count": 18,
+      "null_memberships": {
+        "session_id": [
+          "r14",
+          "r12",
+          "r01"
+        ],
+        "correlation_id": [
+          "r14",
+          "r13"
+        ],
+        "flow_name": [
+          "r14",
+          "r13",
+          "r12",
+          "r08",
+          "r03",
+          "r01"
+        ],
+        "component": [
+          "r14"
+        ],
+        "component_type": [
+          "r14"
+        ],
+        "hook_event": [
+          "r14",
+          "r13"
+        ]
+      },
+      "value_memberships": {
+        "session_id": [
+          "r16",
+          "r11",
+          "r10",
+          "r07",
+          "r06",
+          "r04",
+          "r03",
+          "r02"
+        ],
+        "correlation_id": [
+          "r16",
+          "r11",
+          "r10"
+        ],
+        "flow_name": [
+          "r16",
+          "r11",
+          "r10",
+          "r07",
+          "r06",
+          "r04",
+          "r02"
+        ],
+        "component": [
+          "r13",
+          "r10",
+          "r07",
+          "r06",
+          "r04",
+          "r02"
+        ],
+        "component_type": [
+          "r13",
+          "r10",
+          "r07",
+          "r06",
+          "r04",
+          "r02"
+        ],
+        "hook_event": [
+          "r15",
+          "r12",
+          "r16",
+          "r11",
+          "r10",
+          "r09",
+          "r07",
+          "r06",
+          "r05",
+          "r04",
+          "r03",
+          "r02",
+          "r01"
+        ]
+      },
+      "values": {
+        "session_id": "session-A",
+        "correlation_id": "inv-G",
+        "flow_name": "first_method_context",
+        "component": "block_runtime",
+        "component_type": "block",
+        "hook_event": "UserPromptSubmit"
+      },
+      "expected_rule": "null_only uses explicit null_memberships; value_or_null is ordered union with value_memberships; adding event never_seen gives empty results without exception."
+    },
+    {
+      "id_prefix": "M-ZERO",
+      "fields": [
+        "session_id",
+        "correlation_id",
+        "flow_name",
+        "component",
+        "component_type",
+        "level",
+        "event",
+        "hook_event",
+        "text"
+      ],
+      "rotations": 9,
+      "count": 81,
+      "expected_ids": [],
+      "rule": "Start from Q034. For each of eight categorical selectors or text, replace the chosen value with never_seen. Test nine cyclic insertion orders of the semantic dimensions when assembling request members. Use ordinary JSON request ordering, not an evaluation-order parameter or production test hook. Expect no matches, then run Q011 successfully."
+    },
+    {
+      "id_prefix": "M-BOUNDS",
+      "count": 16,
+      "rule": "For each of eight categorical selectors, 100 distinct never_seen-N values is valid with empty results; 101 values gives too_many_values at filters.<field>.values before reader access.",
+      "valid_expected_ids": [],
+      "invalid_error_code": "too_many_values"
+    }
+  ],
+  "ui_creation_cases": [
+    {
+      "id": "B01",
+      "purpose": "default draft",
+      "draft": {
+        "timeMode": "relative",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {},
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B02",
+      "purpose": "all controls defined",
+      "draft": {
+        "timeMode": "absolute",
+        "relativeSeconds": 3600,
+        "start": "2026-11-09T09:00:00Z",
+        "end": "2026-11-09T10:00:00Z",
+        "fieldValues": {
+          "session_id": [
+            "session-A"
+          ],
+          "correlation_id": [
+            "inv-G"
+          ],
+          "flow_name": [
+            "first_method_context"
+          ],
+          "component": [
+            "block_runtime"
+          ],
+          "component_type": [
+            "block"
+          ],
+          "level": [
+            "ERROR"
+          ],
+          "event": [
+            "failed"
+          ],
+          "hook_event": [
+            "UserPromptSubmit"
+          ]
+        },
+        "nullFields": [],
+        "textValue": "selection",
+        "includeDetails": true,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-09T09:00:00Z",
+          "end": "2026-11-09T10:00:00Z"
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "filters": {
+          "component": {
+            "values": [
+              "block_runtime"
+            ],
+            "include_null": false
+          },
+          "component_type": {
+            "values": [
+              "block"
+            ],
+            "include_null": false
+          },
+          "correlation_id": {
+            "values": [
+              "inv-G"
+            ],
+            "include_null": false
+          },
+          "event": {
+            "values": [
+              "failed"
+            ],
+            "include_null": false
+          },
+          "flow_name": {
+            "values": [
+              "first_method_context"
+            ],
+            "include_null": false
+          },
+          "hook_event": {
+            "values": [
+              "UserPromptSubmit"
+            ],
+            "include_null": false
+          },
+          "level": {
+            "values": [
+              "ERROR"
+            ],
+            "include_null": false
+          },
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": false
+          }
+        },
+        "text": {
+          "value": "selection",
+          "scope": "message_and_details"
+        }
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B03",
+      "purpose": "all history blank controls",
+      "draft": {
+        "timeMode": "all",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {},
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "all"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B04",
+      "purpose": "exact session with retained default time",
+      "draft": {
+        "timeMode": "relative",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {
+          "session_id": [
+            "session-A"
+          ]
+        },
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": false
+          }
+        }
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B05",
+      "purpose": "after session-history shortcut",
+      "draft": {
+        "timeMode": "all",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {
+          "session_id": [
+            "session-A"
+          ]
+        },
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "all"
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "filters": {
+          "session_id": {
+            "values": [
+              "session-A"
+            ],
+            "include_null": false
+          }
+        }
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B06",
+      "purpose": "explicit null session",
+      "draft": {
+        "timeMode": "relative",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {},
+        "nullFields": [
+          "session_id"
+        ],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "filters": {
+          "session_id": {
+            "values": [],
+            "include_null": true
+          }
+        }
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B07",
+      "purpose": "literal null string",
+      "draft": {
+        "timeMode": "relative",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {
+          "session_id": [
+            "null"
+          ]
+        },
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "filters": {
+          "session_id": {
+            "values": [
+              "null"
+            ],
+            "include_null": false
+          }
+        }
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B08",
+      "purpose": "multiple levels OR",
+      "draft": {
+        "timeMode": "relative",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {
+          "level": [
+            "ERROR",
+            "WARNING"
+          ]
+        },
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "filters": {
+          "level": {
+            "values": [
+              "ERROR",
+              "WARNING"
+            ],
+            "include_null": false
+          }
+        }
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B09",
+      "purpose": "literal whitespace message",
+      "draft": {
+        "timeMode": "relative",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {},
+        "nullFields": [],
+        "textValue": "  selection  ",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "text": {
+          "value": "  selection  ",
+          "scope": "message"
+        }
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B10",
+      "purpose": "details search scope",
+      "draft": {
+        "timeMode": "relative",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {},
+        "nullFields": [],
+        "textValue": "needle",
+        "includeDetails": true,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "page_size": 200,
+        "order": "file_append_desc",
+        "text": {
+          "value": "needle",
+          "scope": "message_and_details"
+        }
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B11",
+      "purpose": "before only",
+      "draft": {
+        "timeMode": "absolute",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "2026-11-09T10:00:00Z",
+        "fieldValues": {},
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "absolute",
+          "end": "2026-11-09T10:00:00Z"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B12",
+      "purpose": "after only",
+      "draft": {
+        "timeMode": "absolute",
+        "relativeSeconds": 3600,
+        "start": "2026-11-09T09:00:00Z",
+        "end": "",
+        "fieldValues": {},
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "absolute",
+          "start": "2026-11-09T09:00:00Z"
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      },
+      "expected_search_requests_before_run": 0
+    },
+    {
+      "id": "B13",
+      "purpose": "draft after clear",
+      "draft": {
+        "timeMode": "relative",
+        "relativeSeconds": 3600,
+        "start": "",
+        "end": "",
+        "fieldValues": {},
+        "nullFields": [],
+        "textValue": "",
+        "includeDetails": false,
+        "pageSize": 200
+      },
+      "expected_request": {
+        "query_version": 1,
+        "time": {
+          "mode": "relative",
+          "seconds": 3600
+        },
+        "page_size": 200,
+        "order": "file_append_desc"
+      },
+      "expected_search_requests_before_run": 0
+    }
+  ],
+  "canonical_representation": "Dates: UTC ISO-8601 with six fractional digits and Z; selectors have sorted deduplicated values and explicit include_null; absent selectors omitted; no text => null. Explicit expected_canonical values are static review data."
+}

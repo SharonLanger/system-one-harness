@@ -1,13 +1,16 @@
 # Offline test suites
 
-Run Python tests after installing `.[test]` and building `typescript-helper`:
+Run Python tests after installing `.[test]` and building `typescript-helper`. The full suite also exercises the local viewer in Chromium; install the browser before running it:
 
 ```sh
+python -m playwright install chromium
 python -m pytest -q tests/unit
 python -m pytest -q tests/integration
 python -m pytest -q tests/system
 python -m pytest -q
 ```
+
+On a minimal Linux system, use `python -m playwright install --with-deps chromium`. See the [viewer scenario contracts](log_viewer_contracts/README.md) for focused commands, fixture expectations, and browser executable selection. These tests run the real local HTTP service and require loopback sockets and browser processes to be permitted.
 
 `unit/` tests one component with isolated collaborators. `integration/` connects
 real blocks, flows, and source utilities to a scripted Laya boundary. `system/`
@@ -39,7 +42,7 @@ section). Choose **Offline tests** and a named job:
 - **Python / integration**: connected flows, blocks and source utilities.
 - **Python / end-to-end**: real process entry points and session lifecycle.
 - **Python / existing-suite**: all remaining active Python tests, including the
-  root-level and block-runtime tests. This keeps existing coverage active while
+  root-level, block-runtime and viewer contract tests. This keeps existing coverage active while
   the suite organization evolves.
 - **TypeScript / build and tests**: compiles the helper and runs all Node tests.
 

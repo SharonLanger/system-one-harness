@@ -1,5 +1,0 @@
-{
-  "name": "demo_noul_accept_valid",
-  "question_type": "noul",
-  "conditions": [{"field": "distance_from_boundary", "op": "gte", "value": 0.0}]
-}

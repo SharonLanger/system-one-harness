@@ -21,7 +21,7 @@ npm test --prefix typescript-helper
 python scripts/check_repository_hygiene.py
 ```
 
-The TypeScript build is needed for Python tests that inspect TypeScript source. See [the test guide](tests/README.md) for unit, integration, system and deferred test boundaries. If a check cannot run locally, say which one and why in the PR. GitHub Actions runs the checks on PRs; include the run link when useful.
+The TypeScript build is needed for Python tests that inspect TypeScript source. See [the test guide](tests/README.md) for unit, integration, system and example test boundaries. If a check cannot run locally, say which one and why in the PR. GitHub Actions runs the checks on PRs; include the run link when useful.
 
 ## Prepare a pull request
 

@@ -22,25 +22,12 @@ The `ShipmentService` constructor is additional to the 25 implemented named func
 
 Stock records use unique exact SKUs; order SKUs are trimmed. Monetary values are rounded to cents. Reservation results are snapshots: create a new service from the returned stock to represent a later reservation state. Report readiness is evaluated independently against the service's stock snapshot; reports do not allocate stock across orders. Parcel building preserves consolidated order order and uses the current parcel until the next unit would exceed capacity.
 
-## Suggested single-method experiment prompts
+## Use in tests
 
-- Extract only `ShipmentService.describe`, including its cross-file call context.
-- Explain only `PackingCalculator.buildParcels` and identify its inventory dependencies.
-- Refactor only `quoteOrderShipping` while preserving freight and insurance behavior.
-- Review only `reserveOrderStock` for validation and input mutation behavior.
-- Inspect `buildShippingReportRow` and its calls through `ShipmentOperations`.
-- Explain only `renderShippingManifest` and its summary formatting dependencies.
-
-This fixture expansion adds production examples only; it does not add or change tests.
-
-These suggestions describe possible tasks; the existing hook flow only accepts
-the `Explain \`path.ts\`: question` format. Ready events in
-`experiments/inputs/hook_inventory.json`, `hook_packing.json`, `hook_pricing.json`,
-`hook_shipment.json`, and `hook_reporting.json` use that format. For example:
-
-```bash
-python experiments/hook_user_prompt_submit.py --input experiments/inputs/hook_inventory.json --deadline 120
-```
+Tests copy this project to a temporary directory and pass an explicit project
+root to the source utilities or flow. Use a prompt such as
+`Explain src/fulfillment/inventory.ts: reserveOrderStock`. Model answers are
+scripted; the fixture is parsed as source and never executed by a hook.
 
 Inline callbacks are intentionally present: they should not become standalone
 outline candidates. Calls through the injected `ShipmentOperations` interface
@@ -49,8 +36,8 @@ can report unresolved dispatch. Use the inventory example first for a simple
 selection; deeper service examples may encounter context limits or dependency
 gaps. The fixture is parsed as source, not executed by the hook.
 
-## First-flow fixture provenance
+## Provenance
 
-Copied from `experiments/fixtures/connected_project/` at upstream commit
+Copied from the original connected-project research fixture at commit
 `223b83b90c7c8f3b397c17f80f48908b579a8556`. Source tree, imports and tsconfig
 are unchanged. First-flow tests use temporary copies of this test-owned fixture.

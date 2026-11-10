@@ -77,7 +77,7 @@ def test_mock_mode_requires_explicit_loader():
     assert 'laya_mlx' not in sys.modules
 
 
-def test_example_without_sdk():
-    result = subprocess.run([sys.executable, 'examples/basic_question.py'], env={**__import__('os').environ,'PYTHONPATH':'src'}, capture_output=True,text=True,check=True)
+def test_mock_prediction_subprocess_without_sdk():
+    result = subprocess.run([sys.executable, '-m', 'tests.support.mock_basic_question'], env={**__import__('os').environ,'PYTHONPATH':'src'}, capture_output=True,text=True,check=True)
     assert json.loads(result.stdout)['answers']['fruit']['choice'] == 'apple'
     assert result.stderr == ''

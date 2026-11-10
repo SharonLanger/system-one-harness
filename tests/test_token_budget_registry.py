@@ -43,7 +43,7 @@ def test_failed_capability_initialization_retries_without_marking_verified():
 
 def test_provider_and_registry_ownership():
     capability()
-    from examples._plumbing_inspection import plumbing_provider as provider
+    from tests.support.plumbing_inspection import plumbing_provider as provider
     registry=AgentRegistry(loader=lambda *a:Agent(),inspection_provider=provider)
     with pytest.raises(ValueError,match='registry owns'):
         predict('hello',REQUEST['questions'],registry=registry,inspection_provider=provider)

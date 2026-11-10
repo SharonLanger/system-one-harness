@@ -1,4 +1,0 @@
-{
-  "text": "Explain `experiments/fixtures/connected_project/src/billing/invoice-controller.ts`: how does getAdjustedTotal obtain an invoice total?",
-  "config": {"model": "aac6fef/laya-typed-decisions-mlx", "temperature": null, "lang": "en"}
-}

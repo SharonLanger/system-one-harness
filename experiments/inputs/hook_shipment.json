@@ -1,8 +1,0 @@
-{
-  "session_id": "synthetic-hook-shipment",
-  "transcript_path": "unused.jsonl",
-  "permission_mode": "default",
-  "hook_event_name": "UserPromptSubmit",
-  "cwd": "__REPOSITORY_ROOT__",
-  "prompt": "Explain `experiments/fixtures/connected_project/src/fulfillment/shipment-service.ts`: how does ShipmentService.checkAvailability find stock shortages? Focus on this one method."
-}

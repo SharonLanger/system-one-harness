@@ -1,5 +1,0 @@
-{
-  "name": "demo_choice_accept_valid",
-  "question_type": "choice",
-  "conditions": [{"field": "probability_gap", "op": "gte", "value": 0.0}]
-}

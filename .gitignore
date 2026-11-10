@@ -13,7 +13,7 @@ node_modules
 *.iml
 .DS_Store
 /backup/
-# Generated evidence; authored campaign cases and docs stay tracked
+# Local logs, diagnostic output and legacy experiment results (never commit)
 /logs/
 .logs/
 /results/

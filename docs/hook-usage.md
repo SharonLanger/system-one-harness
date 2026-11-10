@@ -4,17 +4,17 @@ The default hook routes through the gateway, common dispatcher and UserPromptSub
 
 It returns the complete selected method and one level of called-method navigation: project-relative path, signature and inclusive definition lines. Called-method bodies, recursive dependencies and incoming callers are not included.
 
-## Offline verification
+## Try the flow
 
-Build the existing TypeScript helper, then run:
+Use [plugin setup](../plugins/README.md) for normal installation and lifecycle
+instructions, and the [flow guide](flows/method-context.md) for supported cases.
+To exercise the gateway with real source extraction, real SQLite persistence and
+scripted model answers, run `python examples/hook_sanity.py` after building the
+TypeScript helper. See [all examples](../examples/README.md) for real-model checks.
 
-```bash
-python -m pytest -q tests/first_flow
-```
-
-Tests mock both public requested-action and method-selection building blocks; deterministic source utilities, dispatchers and serializer run normally. Model/tokenizer tripwires prevent real inference. These tests verify orchestration and transport, not model answer quality or actual Claude delivery.
-
-The older `examples/user_prompt_submit_scenario.py` uses a historical SDK-only mock designed for the sandbox. It is retained unchanged and is not the current first-flow acceptance command.
+Offline integration tests are under `tests/integration/flows/`; process and
+session tests are under `tests/system/`. They do not establish live model accuracy
+or actual Claude delivery. See the [test guide](../tests/README.md).
 
 ## Manual registration recipe
 
@@ -28,7 +28,7 @@ Install the package in the selected interpreter and build the pinned helper. Rep
         "hooks": [
           {
             "type": "command",
-            "command": "\"/absolute/system-one-harness/.venv/bin/python\" \"/absolute/system-one-harness/hooks/user_prompt_submit.py\" --repository-root \"$CLAUDE_PROJECT_DIR\" --config \"/absolute/run-config.json\" --real --deadline 10",
+            "command": "\"/absolute/system-one-harness/.venv/bin/python\" -m cli hook --hook UserPromptSubmit --repository-root \"$CLAUDE_PROJECT_DIR\" --config \"/absolute/run-config.json\" --real --deadline 10",
             "timeout": 15
           }
         ]
@@ -38,7 +38,7 @@ Install the package in the selected interpreter and build the pinned helper. Rep
 }
 ```
 
-Use a synchronous command hook. The earlier `hooks/user_prompt_submit.py` path remains a forwarding wrapper. New registrations can use `python -m hooks.gateway --hook UserPromptSubmit` with the same operational arguments.
+Use a synchronous command hook. This manual alternative uses the selected Python's installed CLI module. Do not register both this recipe and the plugin for the same event. The legacy `hooks/user_prompt_submit.py` forwarding wrapper remains supported, but is not needed here.
 
 To disable it, remove this UserPromptSubmit entry while preserving unrelated settings. Omitting `--real` produces no enrichment without loading the model. Tests exercise the recipe with public block mocks, including opt-out behavior, without installing settings.
 
@@ -50,7 +50,7 @@ To disable it, remove this UserPromptSubmit entry while preserving unrelated set
 
 The source string retains its exact formatting and line endings. The flow logs that exact final enrichment through the existing logger. Decoding its `additional_context` log field reproduces the hook's returned text. Prepared context is not proof of successful emission or Claude consumption.
 
-Legacy dependency-depth/source-budget flags remain accepted but do not request dependency-body collection in the new flow. Tokenizer support is separate pending work and is not implemented by this flow cleanup.
+Legacy dependency-depth/source-budget flags remain accepted but do not request dependency-body collection in the new flow. Strict tokenizer inspection is a separate opt-in [prediction/block API](input-budgets.md); this flow does not invoke it.
 
 ## Hook protocol
 
@@ -70,10 +70,14 @@ The original user prompt is preserved. Success emits one JSON object with `hookS
 
 The gateway validates common fields, owns final serialization and isolates ordinary Python/fd1 noise from protocol stdout. It requires session_id, transcript_path, cwd, hook_event_name and prompt for UserPromptSubmit; permission_mode is optional. Transcript contents are not read. Input `hook_event_name` and output `hookEventName` intentionally have different spelling.
 
-## Sandbox and reusable components
+## Reusable components
 
-The old implementation is `flows.sandbox_file_method_context`. `flows.file_method_context.run` remains a compatibility re-export for existing experiments, examples and live-check callers. The old enrichment adapter is explicitly sandbox-only and disconnected from the default dispatcher; its root/config preparation helper is still reused.
+The default flow is `flows.first_method_context`. Its selected-method presentation
+uses the TypeScript outgoing-navigation utility; it does not collect dependency
+bodies. `context_format.format_context` and the compatibility
+`flows.file_method_context.run` API have different output contracts and are not
+invoked by this hook route. The compatibility flow remains available to the
+larger `live_check` diagnostic.
 
-The reusable `context_format.format_context` utility and dependency collectors remain available to their existing callers. Their supporting-body format is not the active hook format. The new flow's presentation is in `flows/first_method_context.py`, and it uses the existing outgoing navigation utility.
-
-See the design (historical material; see docs/cleanup-local-files.md), test plan (historical material; see docs/cleanup-local-files.md) and sandbox retirement (historical material; see docs/cleanup-local-files.md) for implementation scope and coverage. Live Claude delivery remains a separate check.
+For persistence, read [session storage](session-state.md). For startup failures,
+correlation IDs and event fields, read the [log data model](log-viewer/DATA_MODEL.md).

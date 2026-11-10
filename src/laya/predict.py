@@ -1,4 +1,4 @@
-"""Lazy strict SDK boundary. See docs/token-budget-migration.md for failures."""
+"""Lazy strict SDK boundary. See docs/input-budgets.md for failures."""
 from copy import deepcopy
 import json
 import math

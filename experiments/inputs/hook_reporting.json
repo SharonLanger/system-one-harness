@@ -1,8 +1,0 @@
-{
-  "session_id": "synthetic-hook-reporting",
-  "transcript_path": "unused.jsonl",
-  "permission_mode": "default",
-  "hook_event_name": "UserPromptSubmit",
-  "cwd": "__REPOSITORY_ROOT__",
-  "prompt": "Explain `experiments/fixtures/connected_project/src/fulfillment/reporting.ts`: how does renderShippingManifest format and order its output lines? Focus on this one method."
-}

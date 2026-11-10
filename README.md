@@ -11,7 +11,7 @@
 
 ![Animated composition: Laya question blocks and deterministic tools combine into a Python flow connected through a Claude Code plugin.](docs/readme-assets/build-with-blocks.svg)
 
-**[Set up](#set-up-a-development-checkout)** · **[View logs](#local-log-viewer)** · **[Run tests](#run-tests)** · **[How it works](#how-it-works)**
+**[Set up](#set-up-a-development-checkout)** · **[View logs](#local-log-viewer)** · **[Examples](examples/README.md)** · **[Guides](docs/README.md)** · **[Run tests](#run-tests)** · **[How it works](#how-it-works)**
 
 </div>
 
@@ -26,7 +26,7 @@ A question block packages a focused model decision behind a defined input and ou
 | [Question blocks](src/building_blocks/questions/) | Structured inputs, decisions, domain outputs, and reasons for skipping or declining a selection. |
 | [Block runtime](src/block_runtime/README.md) | Input/output validation, question and rule overrides, preparation, and result reduction. |
 | [Deterministic tools](typescript-helper/README.md) | TypeScript outlines, source extraction, and navigation without a model decision. |
-| [Method-selection evaluation](src/building_blocks/questions/method_selection_v2/README.md) | Compared question/rule profiles, correct and incorrect selections, and missed targets. Development results are documented; held-out validation is pending. |
+| [Method selection](src/building_blocks/questions/method_selection_v2/README.md) | Current inputs, decisions, default rules and limitations. Development observations are documented; held-out validation is pending. |
 
 A block result exposes its status, decisions, and domain data. Those outputs explain what happened in a call; evaluation results describe how well a particular configuration performed on a particular dataset. Changing questions or rules requires checking the new configuration rather than assuming the old measurements still apply.
 
@@ -99,7 +99,7 @@ npm test --prefix typescript-helper
 python scripts/check_repository_hygiene.py
 ```
 
-The Python suite includes unit, integration, system, and existing active tests. See [the test guide](tests/README.md) for suite boundaries and how to find each job's results on GitHub. The experiment-derived checks in `tests/deferred/` are deliberately excluded from the ordinary test command; they are retained for later migration and are not counted as passing coverage. The TypeScript tests run separately with Node. GitHub Actions runs these checks on pull requests.
+The Python suite includes unit, integration, system, and existing active tests. See [the test guide](tests/README.md) for suite boundaries and how to find each job's results on GitHub. The TypeScript tests run separately with Node. GitHub Actions runs these checks on pull requests.
 
 ## How it works
 
@@ -127,10 +127,6 @@ For manual registration, see [hook usage](docs/hook-usage.md). [Configuration co
 
 ## Project status and community
 
-SOH is an experimental research prototype made for fun, not a stable published package or hosted service. Real inference currently requires local setup. Tests exercise the harness with controlled responses; they do not establish the model's answer quality. Some historical experiment checks remain deferred.
+SOH is an experimental research prototype made for fun, not a stable published package or hosted service. Real inference currently requires local setup. Tests exercise the harness with controlled responses; they do not establish the model's answer quality. General model-config and standalone-policy duplicate-key rejection remains unimplemented; two corresponding tests explicitly skip.
 
 For bugs and changes, read [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability privately, read [SECURITY.md](SECURITY.md). Project-owned source is offered under [Apache License 2.0](LICENSE); separately obtained runtimes and model weights have their own terms.
-
-## Log viewer change log
-
-- 2026-11-09: Added `logs --ui` for local filtering and JSON inspection across hourly files, with explicit Run, snapshot pagination, cancellation, refresh and interrupted-page recovery. Scenario contracts LV01–LV16 cover these behaviors. Future behavior changes should update the affected cases and record their reason here; CI reports validation for each commit.

@@ -40,6 +40,7 @@ Use semantic versioning: increment the patch for fixes or documentation, the min
 - Clarify SOH naming, CLI installation, hook enable/disable and upgrade steps.
 - Link to the setup and log viewer guides; explain that prompt observe-only mode
   leaves PostCompact active. Hook commands and protocol are unchanged.
+- Link maintained block contracts after removing historical research reports.
 
 ### 1.3.1
 
@@ -49,14 +50,14 @@ Use semantic versioning: increment the patch for fixes or documentation, the min
 
 - Adopt Method Selection V2's Q0 / combined-strict profile: confidence ≥ 0.70, probability gap ≥ 0.25, default temperature 0.5.
 - Retain the experiment's multiple-method guard and explicit caller overrides.
-- Add the [method-selection-200 research report](../../src/building_blocks/questions/method_selection_v2/research/method-selection-200-results.md), with five-profile comparisons, noise/difficulty breakdowns and committed development evidence.
+- Current inputs, defaults and limitations are documented in the [method-selection contract](../../src/building_blocks/questions/method_selection_v2/README.md).
 
 ### 1.2.0
 
 - Adopt requested-action combination #3: C1 short choices, block-default temperature 1.0, and probability gap ≥ 0.10.
-- Add the four-choice `unclear` option and preserve the public `undecided` fallback; three-choice question overrides must migrate to four choices.
+- Add the four-choice `unclear` option and preserve the public `undecided` fallback; question overrides must contain all four choices.
 - Preserve explicit temperature overrides and other blocks’ settings.
-- Document the [500-case results and selection](../../docs/requested-action/requested-action-500-results.md), including 26.2% overall error among accepted answers.
+- Current decisions, overrides and limitations are documented in the [requested-action contract](../../src/building_blocks/questions/requested_action/README.md).
 
 ### 1.1.0
 

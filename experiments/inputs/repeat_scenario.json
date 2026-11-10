@@ -1,5 +1,0 @@
-{
-  "config": {"model": "aac6fef/laya-typed-decisions-mlx", "temperature": null, "lang": "en"},
-  "question": {"type": "choice", "instructions": "Which fruit is mentioned?", "criteria": {"apple": "apple", "pear": "pear", "orange": "orange"}},
-  "prompts": ["The lunch bag contains an apple.", "At the market, I bought a pear.", "Orange juice was served with breakfast."]
-}

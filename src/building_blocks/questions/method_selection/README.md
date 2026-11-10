@@ -14,7 +14,7 @@ A unique name is its label. Same-name candidates with different signatures use `
 
 One shared QuestionBlock call handles both questions and interpretation. Templates are copied; policies and expected answers never enter model payloads. Empty candidates skip inference. Defaults remain 64 candidates and 16000 input Unicode characters (prompt plus compact question JSON, not tokens); overflow refuses without truncation. Thresholds are unchanged and illustrative.
 
-See [TypeScript utility contracts](../../../../../typescript-helper/README.md) for the public outline boundary and snapshot identity rules; tests are `tests/test_method_selection.py`, `tests/test_readable_method_selection.py` and `tests/test_method_ambiguity_fallback.py`.
+See [TypeScript utility contracts](../../../../typescript-helper/README.md) for the public outline boundary and snapshot identity rules; tests are `tests/test_method_selection.py`, `tests/test_readable_method_selection.py` and `tests/test_method_ambiguity_fallback.py`.
 
 `run` remains the dictionary-returning compatibility interface with its original
 signature. Versioned outlines now execute the sibling `method_selection_v2` block;

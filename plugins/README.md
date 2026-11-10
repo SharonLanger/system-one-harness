@@ -37,8 +37,11 @@ installing SOH. The two distributions claim the same legacy console command.
 The new package supplies both `system-one-harness` and the compatibility command
 `laya-context-router`; use the new name in your setup.
 
-`doctor` prints the interpreter, **CLI install location**, log directory,
-and basic local checks. Copy the printed CLI path and verify it runs:
+`doctor` prints the interpreter, log directory and basic local checks. Copy the
+entire value after **`CLI install location (standard environment):`**, including
+the final `/system-one-harness`. This executable path is the value for
+`env.LAYA_CONTEXT_ROUTER_CLI` in Claude settings; do not use the Python interpreter
+or package directory. Verify the copied path runs:
 
 ```bash
 "/path/to/environment/bin/system-one-harness" doctor

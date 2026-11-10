@@ -69,7 +69,7 @@ To inspect a specific existing log root:
 SOH_LOG_ROOT=/absolute/path/to/.logs system-one-harness logs --ui
 ```
 
-Choose the root containing the date directories, not a single hourly file. The viewer does not create a missing root or combine multiple roots. The root follows the SOH installation or explicit override; changing the terminal's working directory does not select another project's logs. Legacy `logs/debug.jsonl` is not included. See [hook invocation logs](../hook-logging.md) for the record schema and event meanings.
+Choose the root containing the date directories, not a single hourly file. The viewer does not create a missing root or combine multiple roots. The root follows the SOH installation or explicit override; changing the terminal's working directory does not select another project's logs. Legacy `logs/debug.jsonl` is not included. See [log data model](DATA_MODEL.md) for the record schema and event meanings.
 
 ## View logs in the terminal
 

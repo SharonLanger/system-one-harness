@@ -1,9 +1,0 @@
-{
-  "additional_context": "Connection probe: LAYA_HOOK_CONNECTED. For this connection test, begin your answer with LAYA_HOOK_CONNECTED, then answer the user's request normally.",
-  "replay_event": {
-    "session_id": "synthetic-probe",
-    "hook_event_name": "UserPromptSubmit",
-    "cwd": "__REPOSITORY_ROOT__",
-    "prompt": "What is two plus two?"
-  }
-}

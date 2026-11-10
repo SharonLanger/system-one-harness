@@ -1,24 +1,22 @@
 # Method selection V2
 
-## Research documentation and selected profile
+Select one callable from a validated TypeScript outline using the shared block
+runtime. This block makes a semantic choice; it does not read or execute source.
 
-**Method-selection-200 defines the V2 default: Q0 + combined-strict at temperature 0.5.** The method answer must satisfy confidence ≥ 0.70 **and** probability gap ≥ 0.25. The fixed multiple-method guard remains part of the tested decision. Q0 and Q1 are alternative experiment wordings, not a combined question.
+## Default profile and limitations
 
-On the 120-input development split, this profile selected **65 correct methods and one incorrect method**, missed **19/84 valid targets (22.6%)**, and correctly refused **35/36** no-single-target requests. Observed pick precision was **98.5%**; overall correctness including refusals was **83.3%**. Held-out validation is pending.
+The default question wording is Q0, with requested temperature **0.5** when the
+caller leaves it unset. A selected method must meet **confidence ≥ 0.70** and
+**probability gap ≥ 0.25**, plus the separate multiple-method guard. Explicit
+caller overrides remain supported. `block.json` references definitions under
+`src/defaults/questions/` and shared rules under `src/defaults/rules/`.
 
-| Profile | Question | Rule | Temp. | Correct picks | Wrong picks | Missed targets / 84 | Pick precision | Overall / 120 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | Q0 | r1-ungated | 1.0 | 73 | 2 | 11 (13.1%) | 97.3% | 107 (89.2%) |
-| B | Q0 | r7-entropy-075 | 0.5 | 73 | 2 | 11 (13.1%) | 97.3% | 107 (89.2%) |
-| C **SELECTED** | Q0 | r9-combined-strict | 0.5 | 65 | 1 | 19 (22.6%) | 98.5% | 100 (83.3%) |
-| D | Q1 | r5-gap-030 | 1.0 | 63 | 0 | 21 (25.0%) | 100.0% | 99 (82.5%) |
-| E | Q0 | r0-current | 1.0 | 63 | 1 | 21 (25.0%) | 98.4% | 98 (81.7%) |
-
-This is a five-profile decision shortlist, including the previous baseline; it is not a pure accuracy ranking. Missed percentages use 84 selectable inputs, precision uses actual selections, and overall correctness uses all 120 inputs.
-
-**[Read the full research report →](research/method-selection-200-results.md)** for the same five profiles by noise level, harder request types and candidate count; exact question wording and rules; the accuracy leaders; limitations; and links to experiment design and original summaries. Downloadable evidence (historical material; see docs/cleanup-local-files.md) preserves provenance and all 80 configurations.
-
-The block uses 0.5 when no temperature is supplied; explicit runtime overrides remain supported. The reported results apply to the exact selected settings. See the report before changing the guard or interpreting “ungated” as always selecting a method.
+Development evaluation on 120 inputs produced 65 correct picks, one wrong pick,
+19 missed targets out of 84 valid targets, and 35 correct refusals out of 36
+no-single-target requests. Pick precision was 98.5%; overall correctness including
+refusals was 83.3%. These observations apply to those exact settings and data;
+held-out validation is pending and stricter rules can miss valid targets.
+Independent default-profile expectations remain in the production test fixtures.
 
 ## Input and runtime contract
 

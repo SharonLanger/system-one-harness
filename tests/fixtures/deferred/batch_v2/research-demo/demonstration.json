@@ -1,9 +1,0 @@
-{
-  "kind": "synthetic mechanical only",
-  "run_folder": "/workspace/scratch/84ed82d633cc/track-a-sol/experiments/batch_v2/results/fruit-smoke/20261031T172525569858Z__9301931fed",
-  "inference_calls": 12,
-  "logical_outcomes": 24,
-  "campaign_ready": false,
-  "compact_manifest": "compact/evidence-manifest.json",
-  "raw_archive_sha256": "117a71153392ef11ebbb7117543faa18ba61301c928edb59eb4ba4ef3dd8a7fd"
-}

@@ -5,7 +5,7 @@ import pytest
 from laya import predict as api
 from laya.budget import InspectionUnavailable
 from test_predict import REQUEST,RAW
-from examples._plumbing_inspection import plumbing_provider
+from tests.support.plumbing_inspection import plumbing_provider
 
 @pytest.mark.parametrize('kind',['direct','closure_wrapper'])
 def test_legacy_predict_needs_no_inspection(kind):

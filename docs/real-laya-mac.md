@@ -12,11 +12,12 @@ From your checkout, with that environment activated:
 
 ```bash
 python -m pip install -e '.[test]'
+python -m playwright install chromium
 npm --prefix typescript-helper ci --ignore-scripts --no-audit --no-fund
 npm --prefix typescript-helper run build
 npm --prefix typescript-helper test
 python -m pytest -q
-python -m laya_context_router.live_check --help
+python -m live_check --help
 ```
 
 The checks above use mocks at the SDK boundary. They do not import Laya or infer.
@@ -26,7 +27,7 @@ or use your existing cache and may take time. Choose a new output path outside
 the checkout; an existing evidence file is never overwritten:
 
 ```bash
-python -m laya_context_router.live_check --real --output "$HOME/laya-first-result.json"
+python -m live_check --real --output "$HOME/laya-first-result.json"
 ```
 
 This uses one checkpoint with SDK-default settings. It asks an easy named
@@ -54,7 +55,7 @@ explicit temperature values, run the optional matrix. Replace each placeholder
 with your confirmed value; these are not suggested checkpoints or settings:
 
 ```bash
-python -m laya_context_router.live_check --real \
+python -m live_check --real \
   --second-model 'CONFIRMED_SECOND_CHECKPOINT' \
   --temperature CONFIRMED_T1 --temperature CONFIRMED_T2 \
   --output "$HOME/laya-matrix-result.json"

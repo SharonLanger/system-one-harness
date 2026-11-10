@@ -1,15 +1,31 @@
-# hook-laya
+# System One Harness — Claude Code plugin
 
-Current version: **1.3.1** (declared in `.claude-plugin/plugin.json`).
+Current version: **1.3.2** (declared in `.claude-plugin/plugin.json`).
 
 Connects Claude Code hooks to System One Harness through the existing CLI gateway and dispatcher.
+
+**[Install and configure the plugin →](../README.md)** — CLI installation, logging
+check, enabling enrichment, disabling hooks and upgrading an existing copy.
+
+The plugin identifier remains `hook-laya`. The primary CLI is `system-one-harness`;
+`LAYA_CONTEXT_ROUTER_CLI` is a compatibility setting that must point to that
+installed executable. Keep the setting's name as written in the setup guide.
 
 ## Hooks
 
 - `UserPromptSubmit`: runs the existing prompt-context flow.
 - `PostCompact`: runs `hook --hook PostCompact --log-state` after manual or automatic compaction, appending one shared `PostCompact` event and timestamp to the session’s SQLite history.
 
-Build the TypeScript helper with `npm --prefix typescript-helper run build`, ensure Node is on PATH, and configure `LAYA_CONTEXT_ROUTER_CLI` to point to the installed SOH executable. Sensitive session state lives at `<SOH root>/.soh/session-state.sqlite3`, independent of the target project/cwd. Session persistence uses Python only; Node is used by source extraction. Old JSONL is not imported or deleted. No automatic retention applies. Never commit or upload the database or its sidecars. See [session storage](../../docs/session-state.md).
+The shipped prompt hook uses `--real`. The setup guide explains how to check it
+with `--observe-only` first; this does not disable `PostCompact`. Source extraction
+requires the built TypeScript helper and Node on Claude's PATH. Session persistence
+uses Python only.
+
+Sensitive session state lives at `<SOH root>/.soh/session-state.sqlite3`, independent of the target project/cwd. Old JSONL is not imported or deleted. No automatic retention applies. Never commit or upload the database or its sidecars. See [session storage](../../docs/session-state.md).
+
+To inspect hook activity, run `system-one-harness logs --ui` or
+`system-one-harness logs --last 20` from your installed environment.
+See the [log viewer guide](../../docs/log-viewer/README.md).
 
 ## Required versioning rule
 
@@ -18,6 +34,12 @@ Build the TypeScript helper with `npm --prefix typescript-helper run build`, ens
 Use semantic versioning: increment the patch for fixes or documentation, the minor for backward-compatible features, and the major for breaking changes. Keep this README's current version and changelog synchronized with the manifest. If additional plugin version declarations are introduced, update them together. A PR may group related edits into one release version; subsequent published changes require another version.
 
 ## Changelog
+
+### 1.3.2
+
+- Clarify SOH naming, CLI installation, hook enable/disable and upgrade steps.
+- Link to the setup and log viewer guides; explain that prompt observe-only mode
+  leaves PostCompact active. Hook commands and protocol are unchanged.
 
 ### 1.3.1
 

@@ -1,5 +1,7 @@
 # Hook invocation logs
 
+To search and inspect logs in a browser, run `system-one-harness logs --ui`, set your filters, then click **Run search**. See the [log viewer guide](log-viewer/README.md) for session history, JSON inspection, log locations and troubleshooting.
+
 In a source checkout, records are written to `.logs/YYYY-MM-DD/HH-00.jsonl`
 using UTC dates and full zero-padded hours. Installed copies use
 `$XDG_STATE_HOME/system-one-harness/.logs` (or

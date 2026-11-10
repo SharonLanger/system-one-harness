@@ -1,6 +1,6 @@
 # Local viewer API implementation notes
 
-HTTP request version 1 is independent from log schema version 1. All API routes use the launch token as `Authorization: Bearer …`. The launch URL carries it in a fragment; the browser removes it immediately and keeps it in memory. There is no browser persistence or CORS allowance. The server binds to `127.0.0.1` on an ephemeral port and validates Host and Origin. See the [viewer usage](../../README.md#local-log-viewer) and [scenario tests](../../tests/log_viewer_contracts/README.md).
+HTTP request version 1 is independent from log schema version 1. All API routes use the launch token as `Authorization: Bearer …`. The launch URL carries it in a fragment; the browser removes it immediately and keeps it in memory. There is no browser persistence or CORS allowance. The server binds to `127.0.0.1` on an ephemeral port and validates Host and Origin. See the [log viewer guide](README.md) and [scenario tests](../../tests/log_viewer_contracts/README.md).
 
 ## Query request
 

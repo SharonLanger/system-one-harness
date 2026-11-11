@@ -1,7 +1,0 @@
-{
-  "original_pr_head": "27acc84c590535a2593cf0dab945f0bbd2e3c5a9",
-  "integrated_main": "e4faa703d1572a88662e33f2bf8b53f339a5c8aa",
-  "retrieval": "GitHub connector exact-SHA snapshot; all 76 production files verified by Git blob SHA",
-  "dirty_status": null,
-  "availability": "No local Git checkout; final PR commit identifies runner source"
-}

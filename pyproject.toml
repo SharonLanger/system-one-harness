@@ -19,7 +19,6 @@ test = ["pytest>=8,<10", "playwright>=1.50,<2", "setuptools>=68", "wheel"]
 [tool.pytest.ini_options]
 pythonpath = ["src", "tests"]
 testpaths = ["tests"]
-addopts = "--ignore=tests/deferred"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

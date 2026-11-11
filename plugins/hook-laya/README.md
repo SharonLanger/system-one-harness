@@ -1,15 +1,31 @@
-# hook-laya
+# System One Harness — Claude Code plugin
 
-Current version: **1.3.1** (declared in `.claude-plugin/plugin.json`).
+Current version: **1.3.2** (declared in `.claude-plugin/plugin.json`).
 
 Connects Claude Code hooks to System One Harness through the existing CLI gateway and dispatcher.
+
+**[Install and configure the plugin →](../README.md)** — CLI installation, logging
+check, enabling enrichment, disabling hooks and upgrading an existing copy.
+
+The plugin identifier remains `hook-laya`. The primary CLI is `system-one-harness`;
+`LAYA_CONTEXT_ROUTER_CLI` is a compatibility setting that must point to that
+installed executable. Keep the setting's name as written in the setup guide.
 
 ## Hooks
 
 - `UserPromptSubmit`: runs the existing prompt-context flow.
 - `PostCompact`: runs `hook --hook PostCompact --log-state` after manual or automatic compaction, appending one shared `PostCompact` event and timestamp to the session’s SQLite history.
 
-Build the TypeScript helper with `npm --prefix typescript-helper run build`, ensure Node is on PATH, and configure `LAYA_CONTEXT_ROUTER_CLI` to point to the installed SOH executable. Sensitive session state lives at `<SOH root>/.soh/session-state.sqlite3`, independent of the target project/cwd. Session persistence uses Python only; Node is used by source extraction. Old JSONL is not imported or deleted. No automatic retention applies. Never commit or upload the database or its sidecars. See [session storage](../../docs/session-state.md).
+The shipped prompt hook uses `--real`. The setup guide explains how to check it
+with `--observe-only` first; this does not disable `PostCompact`. Source extraction
+requires the built TypeScript helper and Node on Claude's PATH. Session persistence
+uses Python only.
+
+Sensitive session state lives at `<SOH root>/.soh/session-state.sqlite3`, independent of the target project/cwd. Old JSONL is not imported or deleted. No automatic retention applies. Never commit or upload the database or its sidecars. See [session storage](../../docs/session-state.md).
+
+To inspect hook activity, run `system-one-harness logs --ui` or
+`system-one-harness logs --last 20` from your installed environment.
+See the [log viewer guide](../../docs/log-viewer/README.md).
 
 ## Required versioning rule
 
@@ -19,6 +35,13 @@ Use semantic versioning: increment the patch for fixes or documentation, the min
 
 ## Changelog
 
+### 1.3.2
+
+- Clarify SOH naming, CLI installation, hook enable/disable and upgrade steps.
+- Link to the setup and log viewer guides; explain that prompt observe-only mode
+  leaves PostCompact active. Hook commands and protocol are unchanged.
+- Link maintained block contracts after removing historical research reports.
+
 ### 1.3.1
 
 - Document System One Harness naming and the retained `LAYA_CONTEXT_ROUTER_CLI` setting. The hook command and protocol are unchanged.
@@ -27,14 +50,14 @@ Use semantic versioning: increment the patch for fixes or documentation, the min
 
 - Adopt Method Selection V2's Q0 / combined-strict profile: confidence ≥ 0.70, probability gap ≥ 0.25, default temperature 0.5.
 - Retain the experiment's multiple-method guard and explicit caller overrides.
-- Add the [method-selection-200 research report](../../src/building_blocks/questions/method_selection_v2/research/method-selection-200-results.md), with five-profile comparisons, noise/difficulty breakdowns and committed development evidence.
+- Current inputs, defaults and limitations are documented in the [method-selection contract](../../src/building_blocks/questions/method_selection_v2/README.md).
 
 ### 1.2.0
 
 - Adopt requested-action combination #3: C1 short choices, block-default temperature 1.0, and probability gap ≥ 0.10.
-- Add the four-choice `unclear` option and preserve the public `undecided` fallback; three-choice question overrides must migrate to four choices.
+- Add the four-choice `unclear` option and preserve the public `undecided` fallback; question overrides must contain all four choices.
 - Preserve explicit temperature overrides and other blocks’ settings.
-- Document the [500-case results and selection](../../docs/requested-action/requested-action-500-results.md), including 26.2% overall error among accepted answers.
+- Current decisions, overrides and limitations are documented in the [requested-action contract](../../src/building_blocks/questions/requested_action/README.md).
 
 ### 1.1.0
 

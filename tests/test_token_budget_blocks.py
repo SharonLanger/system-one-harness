@@ -52,8 +52,8 @@ def test_both_blocks_propagate_identical_error_without_downstream_work(kind,inst
 
 
 def test_minimal_consumer_receives_full_report_without_retry(instrumentation):
-    assert importlib.util.find_spec('examples.budget_diagnostics') is not None, 'missing minimal diagnostic consumer'
-    from examples.budget_diagnostics import run_with_diagnostics
+    assert importlib.util.find_spec('tests.support.budget_diagnostics') is not None, 'missing minimal diagnostic consumer'
+    from tests.support.budget_diagnostics import run_with_diagnostics
     registry,calls,events=instrumentation
     block=QuestionBlock(BLOCK_DIR)
     result=run_with_diagnostics(block.run,'hello '*2000,config=RunConfig(),registry=registry,strict=True)

@@ -65,3 +65,14 @@ log at INFO. ERROR summaries contain no prompt or source.
 See sibling `method_selection_v2` for dynamic choices, candidate mapping and
 outline input validation. A flow obtains an outline using a utility, then passes
 it into that block; runtime execution does not independently read source files.
+
+## Strict input budgets
+
+Pass `strict=True` to `Block.run` to inspect the final prepared request with the
+registry's supported loaded-tokenizer capability before prediction. A fitting
+request keeps the same result contract. An oversized or uninspectable request
+raises `InputBudgetError` with a diagnostic report, without calling inference or
+the reducer. Model initialization can occur before inspection. Ordinary execution
+does not guarantee token fit, and supplying a provider alone does not enable
+strict mode. See [input budgets](../../docs/input-budgets.md) for supported
+capabilities, refusal types and caller policy.

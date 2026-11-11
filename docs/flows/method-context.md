@@ -1,4 +1,4 @@
-# Method-context proof of concept
+# Method-context flow
 
 [Back to the project README](../../README.md#how-it-works)
 
@@ -22,12 +22,12 @@ The animation shows five representative cases, including two successful actions 
 
 The method-selection block exposes a selected ID or a domain reason, along with candidate/label maps. The generic block result also exposes status, decisions, and data. See its contract before using the block in another flow.
 
-The [evaluation report](../../src/building_blocks/questions/method_selection_v2/research/method-selection-200-results.md) compares configurations and records tradeoffs, including missed targets. It describes development evidence; held-out validation is pending. These results are specific to the evaluated questions, rules, and model settings.
+The [requested-action](../../src/building_blocks/questions/requested_action/README.md) and [method-selection](../../src/building_blocks/questions/method_selection_v2/README.md) contracts describe current defaults and their limitations. A rule acceptance is not a correctness guarantee. Run the [offline flow and hook sanity examples](../../examples/README.md) to see the component chain with explicitly scripted model answers.
 
 ## Session lifecycle and limits
 
-`PostCompact` is a separate event route. It appends a compaction marker to the session's JSONL state so later requests can enrich again. It does not save the compaction summary or write to a database. Session state currently lives under `logs/session-state/`; diagnostics may contain prompts or source code.
+`PostCompact` is a separate event route. It appends a shared compaction marker to the session's SQLite history so later requests can enrich again. It does not save the compaction summary. The database is `<SOH root>/.soh/session-state.sqlite3`, independent of the target project. See [session storage](../session-state.md) for transaction, failure and retention behavior. [Diagnostic logs](../log-viewer/DATA_MODEL.md) are separate and may contain prompts or source code.
 
-The root README's concurrent A/B routing diagram describes a planned capability. This POC uses the current synchronous event handlers.
+The root README's concurrent A/B routing diagram describes a planned capability. This flow uses synchronous event handlers.
 
-Offline tests use scripted Laya responses. They validate harness behavior, not real-model accuracy or installation into a live Claude Code session. See the [test guide](../../tests/README.md) and [plugin setup](../../plugins/hook-laya/README.md).
+Offline tests use scripted Laya responses. They validate harness behavior, not real-model accuracy or installation into a live Claude Code session. See the [test guide](../../tests/README.md) and [plugin setup](../../plugins/README.md).

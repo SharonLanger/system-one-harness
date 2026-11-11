@@ -6,7 +6,7 @@ Each test must name a distinct behavior and link to one scenario ID. Several foc
 
 ## Contract policy
 
-A failing test means its documented viewer behavior may be broken. Do not weaken assertions, delete coverage, skip the test or blindly regenerate expected output to make the suite green. Diagnose the failure. Fix implementation defects while keeping the contract unchanged. For an intentional behavior change, update the scenario, implementation, fixtures where necessary, affected tests and root README change log together. Do not require a test edit when an unchanged test already proves the bug fix.
+A failing test means its documented viewer behavior may be broken. Do not weaken assertions, delete coverage, skip the test or blindly regenerate expected output to make the suite green. Diagnose the failure. Fix implementation defects while keeping the contract unchanged. For an intentional behavior change, update the scenario, implementation, fixtures where necessary, affected tests and maintained usage/API documentation together; explain the reason in the PR description. Do not require a test edit when an unchanged test already proves the bug fix.
 
 Tests should fail when the relevant behavior is broken and pass when it works. A temporary targeted defect can verify that a critical assertion detects its regression; restore the implementation before running the final checks. Never leave a deliberate defect in delivered code.
 

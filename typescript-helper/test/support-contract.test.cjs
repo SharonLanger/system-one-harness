@@ -3,7 +3,7 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const api=require('../../build/typescript/index.js');
 function fixture(files,fn){const root=fs.mkdtempSync(path.join(os.tmpdir(),'laya-contract-'));try{for(const [name,text] of Object.entries(files)){const f=path.join(root,name);fs.mkdirSync(path.dirname(f),{recursive:true});fs.writeFileSync(f,text);}return fn(root);}finally{fs.rmSync(root,{recursive:true,force:true});}}
 test('public invoice outline stops at both callback bodies',()=>{
- const file=path.resolve(__dirname,'../../experiments/fixtures/connected_project/src/billing/invoice-service.ts');
+ const file=path.resolve(__dirname,'../../tests/fixtures/first_flow_project/src/billing/invoice-service.ts');
  const r=api.outline(file);assert.deepEqual(r.callables.map(c=>c.name),['calculateInvoiceTotal','calculateInvoiceTotalWithAdjustment']);
  assert.match(api.extractCallable(file,r.callables[0].id).code,/reduce/);
  assert.ok(r.callables.every(c=>!c.signature.includes('return ')));

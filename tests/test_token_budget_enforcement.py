@@ -10,7 +10,7 @@ from laya.config import RunConfig
 from laya.registry import AgentRegistry
 from token_budget_support import tokenizer
 from test_predict import REQUEST, RAW
-from examples._plumbing_inspection import plumbing_provider
+from tests.support.plumbing_inspection import plumbing_provider
 api=importlib.import_module('laya.predict')
 
 @pytest.fixture
@@ -48,7 +48,7 @@ def test_all_losses_refuse_without_any_forward(kind,calls,mock_provider):
     assert [q['question_id'] for q in report['questions']]==list(questions)
     errors=[e for e in events if e[0]=='ERROR']
     assert len(errors)==1 and errors[0][2]['report']==report
-    assert report['request_id'] and report['violations'] and 'migration' in report['hint']
+    assert report['request_id'] and report['violations'] and 'docs/input-budgets.md' in report['hint']
     assert json.loads(json.dumps(report,allow_nan=False))==report
 
 @pytest.mark.parametrize('provider,error',[ (None,InspectionUnavailable), (lambda *a:(_ for _ in ()).throw(RuntimeError('private failure')),InspectionFailed), (lambda *a:SimpleNamespace(inspect=lambda *a,**k:None),InspectionFailed)])

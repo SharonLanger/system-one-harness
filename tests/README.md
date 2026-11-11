@@ -24,14 +24,15 @@ recording logger. Production uses the Python SQLite session store and JSONL diag
 Use temporary directories for tests of actual file persistence or process
 boundaries. Do not use experiment modules or generated reports as test inputs.
 
-The deferred experiment checks remain excluded by `pyproject.toml`. Each
-relevant harness scenario needs an active replacement before removing a deferred
-case; experiment reporting and export behavior belong to the experiment project.
+Production tests own their fixtures and scripted SDK responses. Manual research
+runners, campaign reporting and export tooling belong in the experiments project,
+not this suite. Removing a research runner does not imply its behavior is covered
+by a harness test.
 
-The first migrated cases are file resolution, file-reference detection, and
-answer rules under `unit/`. Existing first-flow tests and a new real
-prompt-to-context chain are under `integration/flows/`. Prompt, duplicate
-suppression, compaction, and session isolation are under `system/hooks/`.
+The [sanity examples](../examples/README.md) have subprocess checks in
+`tests/test_examples.py`. Offline examples exercise source extraction, the current
+flow and the gateway. Live examples require explicit opt-in; ordinary CI checks
+help/argument handling and controlled outcomes without loading a real model.
 
 ## Find results on GitHub (including on a phone)
 
@@ -61,7 +62,7 @@ This workflow verifies code; it does not publish packages or deploy services.
 Standard GitHub-hosted runners are used; no paid service or model credentials
 are needed by these tests.
 
-## Coverage added after PR 46
+## Behavior covered
 
 | Behavior | Evidence |
 | --- | --- |
@@ -84,13 +85,3 @@ These tests do not establish model quality or full operating-system network/writ
 isolation. Those remain separate work. Existing persistence scenarios are exercised with SQLite; obsolete Node/JSONL transport assertions have been replaced.
 
 `unit/hooks/test_session_store_validation.py` covers metadata, JSON, exact UTF-8 limits, initialization and filtering; `test_session_transaction.py` uses real SQLite locks and coordinated spawned processes for decision races, rollback, process termination and deadlines. `unit/test_repository_hygiene.py` creates only synthetic disposable Git repositories and databases. `system/hooks/test_sqlite_process_lifecycle.py` checks fresh CLI/gateway processes, failure recovery and the existing commit-before-emission limitation. The `SQLite / …` CI matrix supplies focused Python 3.11/Linux and macOS permissions, locks and process checks; local Linux results do not establish macOS validation.
-
-## Next project: experiment migration
-
-Keep all experiments and deferred cases during this change. A later, separately
-planned migration will copy them to a new repository, verify completeness and
-history/provenance, identify harness behavior that needs active coverage here,
-and only then remove the migrated content here with explicit approval. The 105
-named deferred checks are an inventory to disposition, not a requirement to run
-experiment reporting infrastructure in the harness. Do not infer migration
-completion or deletion permission from a green test run.

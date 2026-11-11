@@ -1,4 +1,0 @@
-{
-  "text": "Explain `experiments/fixtures/connected_project/src/utils/currency.ts`: how does formatInvoice produce the displayed amount?",
-  "config": {"model": "aac6fef/laya-typed-decisions-mlx", "temperature": null, "lang": "en"}
-}

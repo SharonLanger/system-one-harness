@@ -47,13 +47,13 @@ conditions key to extend or override the first array; edit that array instead.
 For question blocks, place each policy inside the existing rules_by_question
 envelope, under its matching question name.
 
-## V1 duplicate-key handling decision (F08)
+## Duplicate-key handling
 
 Duplicate-key rejection in the general model-config and standalone-policy loaders
 is deferred. Their current JSON parser silently retains the last occurrence, so
 a repeated conditions key can discard earlier restrictions. Correctly authored
 files must follow the unique-key convention above.
 
-The future rejection tests are retained but skipped for V1. Existing duplicate-key
+Tests for the desired general-loader rejection behavior are explicitly skipped until it is implemented. Existing duplicate-key
 checks in question/block configuration remain active and unchanged. This document
 does not introduce loader validation or promise that all loaders reject duplicates.

@@ -1,12 +1,11 @@
 # Requested action
 
 Classify the requested outcome from one prompt using the shared V2 runtime.
-The opt-in `first_method_context` flow calls this block before selecting methods.
+The `first_method_context` flow calls this block before selecting methods.
 
-## Selected profile and research
+## Default profile and limitations
 
-The default is combination **#3** from the
-[500-case V2 research report](../../../../../docs/requested-action/requested-action-500-results.md):
+The default selected profile uses:
 
 - **Question:** C1 short choices, with four ordered labels.
 - **Requested temperature:** 1.0 when the caller leaves temperature unset.
@@ -15,9 +14,7 @@ The default is combination **#3** from the
 On the 66 easy cases, this combination accepted 51 answers with zero observed
 mistakes. On all 500 cases, it accepted 286 answers with 75 mistakes: **57.2%
 coverage and 26.2% wrong among accepted answers**. The easy-case result is not an
-accuracy guarantee or evidence of a below-20% overall failure rate. The report
-contains all five compared profiles, exact tables, source evidence, design links,
-and the decision to adopt #3.
+accuracy guarantee or evidence of a below-20% overall failure rate. These are development observations for the selected settings, not held-out validation. Independent profile expectations remain in the production tests.
 
 ```python
 from building_blocks.questions.requested_action.block import run
@@ -41,8 +38,7 @@ including surrounding whitespace, Unicode and filenames, passes unchanged.
 Filenames are text; this block reads no target files or TypeScript outlines.
 
 The question lives in `defaults/questions/requested_action.json`; `block.json`
-references it. It exactly matches the campaign's C1 definition, including the
-shared instruction and these four choice descriptions:
+references it. It supplies the shared instruction and these four choice descriptions:
 
 | Choice | Description |
 | --- | --- |
@@ -111,20 +107,16 @@ Construction/catalog access does not load a model. Each run uses one prediction
 and one enrichment; the caller owns registry lifetime. Debug logs retain the
 resolved configuration, question, raw response, enriched metrics and decision.
 
-## Evaluation and input limits
+## Testing and input limits
 
-Run deterministic tests with `python -m pytest -q tests/test_requested_action*.py`.
-These use synthetic SDK responses and verify transport, validation, extraction,
-configuration, gap boundaries, unclear fallback and exact parity with the frozen
-C1/R4 experiment definitions. They do not measure live semantic accuracy.
+Run `python -m pytest -q tests/test_requested_action*.py` for deterministic input,
+configuration, gap-boundary, unclear-fallback and selected-default checks. These
+use synthetic SDK responses and independently frozen profile definitions; they do
+not measure live semantic accuracy. The annotated prompt corpus is test material,
+not a claim that the real model answers each case correctly.
 
-The older E01–E22 corpus in `tests/fixtures/requested_action_prompts.json` retains
-its historical annotations; it is not the V2 500-case evidence. The research report
-links the current campaign and explains its four-label taxonomy and limitations.
-
-No model download or live inference is needed to test these changes. Question
-instructions, choices, formatting and prompt share the model input budget. This
-block forwards the prompt unchanged and does not itself count tokens, guard
-overflow or verify SDK truncation. Long-string tests prove transport only.
-See the [token-budget implementation plan](https://chatgpt.com/library?file_id=libfile_1ac2aa7c68b8819195ce55d60dc35792&account_id=personal)
-and [original block design](../../../../../docs/requested-action/requested-action-block-plan.md).
+The block forwards prompt text unchanged. Ordinary execution does not guarantee
+that input fits the model. Pass `strict=True` to inspect the final request with a
+supported loaded tokenizer and reject oversized input before inference. There is
+no automatic trimming or retry. See [input budgets](../../../../docs/input-budgets.md)
+for supported models, refusal types and caller handling.

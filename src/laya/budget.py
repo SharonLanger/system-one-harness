@@ -2,7 +2,7 @@
 import json
 from uuid import uuid4
 
-HINT = ('See docs/token-budget-migration.md. Inspect the named question, option and boundary; '
+HINT = ('See docs/input-budgets.md. Inspect the named question, option and boundary; '
         'shortening state cannot repair oversized instructions/options. For unavailable '
         'inspection verify the installed runtime, profile and resolved checkpoint.')
 

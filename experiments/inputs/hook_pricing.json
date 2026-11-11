@@ -1,8 +1,0 @@
-{
-  "session_id": "synthetic-hook-pricing",
-  "transcript_path": "unused.jsonl",
-  "permission_mode": "default",
-  "hook_event_name": "UserPromptSubmit",
-  "cwd": "__REPOSITORY_ROOT__",
-  "prompt": "Explain `experiments/fixtures/connected_project/src/fulfillment/pricing.ts`: how does insuranceCharge calculate and round an insurance charge? Focus on this one method."
-}

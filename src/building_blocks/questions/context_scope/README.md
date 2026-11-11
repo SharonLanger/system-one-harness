@@ -99,6 +99,7 @@ provisional and unresolved examples for later Mac evaluation.
 The published typed-decisions MLX default has 1,024 total input tokens shared by
 state, question, choices and formatting. Actual SDK/model limits and truncation
 must be measured separately. The optional action JSON also consumes capacity.
-This block preserves input rather than silently trimming it, and adds no token
-guard or tokenizer. A long-string fake-agent test proves transport only. Live
-evaluation and token-budget verification remain opt-in work on Sharon's Mac.
+This block preserves input rather than silently trimming it. Ordinary execution
+does not enforce token fit; pass `strict=True` to use the shared inspection and
+refusal boundary. See [input budgets](../../../../docs/input-budgets.md). A
+long-string fake-agent test proves transport only, not live tokenizer parity.

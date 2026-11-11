@@ -54,7 +54,6 @@ def test_documented_enable_disable_recipe_with_fixed_block_answers(tmp_path):
     case = hook_case(tmp_path)
     command = (handler['command']
         .replace('/absolute/system-one-harness/.venv/bin/python', sys.executable)
-        .replace('/absolute/system-one-harness/hooks/user_prompt_submit.py', str(HOOK))
         .replace('/absolute/run-config.json', case['args'][3]))
     env = {**case['env'], 'CLAUDE_PROJECT_DIR': str(case['repo'])}
     before = {p: p.read_bytes() for p in case['repo'].rglob('*') if p.is_file()}

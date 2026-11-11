@@ -1,4 +1,0 @@
-{
-  "text": "Explain `experiments/fixtures/connected_project/src/billing/invoice-service.ts`: how does calculateInvoiceTotal compute a total, including its imported adjustment helpers and constants?",
-  "config": {"model": "aac6fef/laya-typed-decisions-mlx", "temperature": null, "lang": "en"}
-}
